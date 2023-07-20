@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
  */
 public class LoginValidator implements ConstraintValidator<CorrectLogin, String> {
     @Override
-    public boolean isValid(String login, ConstraintValidatorContext context){
+    public boolean isValid(String login, ConstraintValidatorContext context) {
         if (login == null) {
             return true;
         }
