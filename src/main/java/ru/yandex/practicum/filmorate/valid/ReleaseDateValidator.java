@@ -9,6 +9,7 @@ import java.time.LocalDate;
  */
 public class ReleaseDateValidator implements ConstraintValidator<CorrectReleaseDate, LocalDate> {
     private static final LocalDate FIRST_FILM_RELEASE_DATE = LocalDate.parse("1895-12-28");
+
     @Override
     public boolean isValid(LocalDate releaseDate, ConstraintValidatorContext context) {
         if (releaseDate == null) {
