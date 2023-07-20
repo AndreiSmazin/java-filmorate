@@ -35,7 +35,7 @@ public class FilmControllerTest {
 
     @BeforeAll
     static void createMapper() {
-        mapper = new ObjectMapper() .registerModule(new JavaTimeModule())
+        mapper = new ObjectMapper().registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
