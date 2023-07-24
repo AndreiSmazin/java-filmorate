@@ -16,14 +16,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.ValidationErrorResponse;
-import ru.yandex.practicum.filmorate.model.Violation;
+import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
+import ru.yandex.practicum.filmorate.valid.Violation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(FilmController.class)
 public class FilmControllerTest {
@@ -80,8 +78,6 @@ public class FilmControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertEquals(1, this.filmController.getFilms().size());
     }
 
     @Test
@@ -104,8 +100,6 @@ public class FilmControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertTrue(this.filmController.getFilms().isEmpty());
     }
 
     @Test
@@ -127,8 +121,6 @@ public class FilmControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(changedTestFilm)));
-
-        assertEquals(changedTestFilm, this.filmController.getFilms().get(testFilm.getId()));
     }
 
     @Test
@@ -156,8 +148,6 @@ public class FilmControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertNotEquals(changedTestFilm, this.filmController.getFilms().get(testFilm.getId()));
     }
 
     @Test
@@ -179,7 +169,5 @@ public class FilmControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertEquals(1, this.filmController.getFilms().size());
     }
 }

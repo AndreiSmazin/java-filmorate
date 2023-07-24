@@ -27,6 +27,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
+        log.info("Получен запрос POST /films c данными: {}", film);
         Film newFilm = new Film(currentID, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration());
         currentID += 1;
         films.put(newFilm.getId(), newFilm);
@@ -36,6 +37,7 @@ public class FilmController {
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
+        log.info("Получен запрос PUT /films c данными: {}", film);
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.info("Данные фильма с id={} обновлены.", film.getId());

@@ -29,6 +29,7 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
+        log.info("Получен запрос POST /users c данными: {}", user);
         String name = user.getName();
         if (name == null || name.isBlank()) {
             name = user.getLogin();
@@ -42,6 +43,7 @@ public class UserController {
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
+        log.info("Получен запрос PUT /users c данными: {}", user);
         if (users.containsKey(user.getId())) {
             String name = user.getName();
             if (name == null || name.isBlank()) {

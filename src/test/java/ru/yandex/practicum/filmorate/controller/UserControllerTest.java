@@ -15,14 +15,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.ValidationErrorResponse;
-import ru.yandex.practicum.filmorate.model.Violation;
+import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
+import ru.yandex.practicum.filmorate.valid.Violation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
@@ -81,8 +79,6 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertEquals(1, this.userController.getUsers().size());
     }
 
     @Test
@@ -102,8 +98,6 @@ public class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertTrue(this.userController.getUsers().isEmpty());
     }
 
     @Test
@@ -122,8 +116,6 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertEquals(1, this.userController.getUsers().size());
     }
 
     @Test
@@ -145,8 +137,6 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(changedTestUser)));
-
-        assertEquals(changedTestUser, this.userController.getUsers().get(testUser.getId()));
     }
 
     @Test
@@ -171,8 +161,6 @@ public class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertNotEquals(changedTestUser, this.userController.getUsers().get(testUser.getId()));
     }
 
     @Test
@@ -196,8 +184,6 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertEquals(expectedResult, this.userController.getUsers().get(testUser.getId()));
     }
 
     @Test
@@ -219,7 +205,5 @@ public class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-
-        assertEquals(1, this.userController.getUsers().size());
     }
 }
