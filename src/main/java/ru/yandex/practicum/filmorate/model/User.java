@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.valid.CorrectLogin;
 
@@ -10,8 +11,9 @@ import javax.validation.constraints.Past;
 import java.time.LocalDate;
 
 @Data
+@AllArgsConstructor
 public class User {
-    private final int id; // идентификатор
+    private int id; // идентификатор
 
     @NotNull
     @Email
@@ -21,7 +23,7 @@ public class User {
     @CorrectLogin
     private final String login; // логин
 
-    private final String name; // имя
+    private String name; // имя
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @NotNull

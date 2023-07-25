@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,8 +22,11 @@ public class ErrorHandlingControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ValidationErrorResponse onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
-
+        for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
+            log.error("Ошибка валидации объекта '{}': некорректное значение '{}' поля '{}'; '{}' {}",
+                    fieldError.getObjectName(), fieldError.getRejectedValue(), fieldError.getField(),
+                    fieldError.getField(), fieldError.getDefaultMessage());
+        }
         final List<Violation> violations = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> new Violation(error.getField(), error.getDefaultMessage()))
                 .collect(Collectors.toList());
@@ -32,7 +36,7 @@ public class ErrorHandlingControllerAdvice {
 
     @ExceptionHandler(IdNotFoundException.class)
     public ResponseEntity<Violation> idNotFoundException(IdNotFoundException e) {
-        log.error(e.getMessage());
+        log.error("Некорректный запрос: {} с id={} не найден", e.getItemType(), e.getId());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("id", e.getMessage()));
     }
