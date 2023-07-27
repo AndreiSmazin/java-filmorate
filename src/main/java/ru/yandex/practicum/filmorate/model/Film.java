@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 public class Film {
-    private int id; // идентификатор
+    private long id; // идентификатор
 
     @NotBlank
     private final String name; // название
