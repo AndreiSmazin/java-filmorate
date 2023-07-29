@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
@@ -56,6 +57,23 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(users)));
+    }
+
+    @Test
+    @DisplayName("GET /users/{id} возвращает HTTP-ответ со статусом 200, типом данных application/json и " +
+            "пользователем в теле")
+
+    void shouldReturnUser() throws Exception {
+        final User testUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+                LocalDate.parse("1991-05-23"));
+
+        Mockito.when(userStorage.findUser(1)).thenReturn(testUser);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testUser.getId()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testUser)));
     }
 
     @Test
@@ -136,6 +154,16 @@ public class UserControllerTest {
     @DisplayName("DELETE /users возвращает HTTP-ответ со статусом 200")
     void shouldDeleteAllUsers() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/users"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("DELETE /users/{id} возвращает HTTP-ответ со статусом 200")
+    void shouldDeleteUser() throws Exception {
+        final long testId = 1;
+
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/users/" + testId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }

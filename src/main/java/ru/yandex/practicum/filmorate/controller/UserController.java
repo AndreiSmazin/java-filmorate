@@ -2,13 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -32,6 +27,11 @@ public class UserController {
         return userStorage.findAllUsers();
     }
 
+    @GetMapping("/{id}")
+    public User find(@PathVariable long id) {
+        return userStorage.findUser(id);
+    }
+
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         log.info("Получен запрос POST /users c данными: {}", user);
@@ -49,6 +49,11 @@ public class UserController {
     @DeleteMapping
     public void deleteAll() {
         userStorage.deleteAllUsers();
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable long id) {
+        userStorage.deleteUser(id);
     }
 }
 

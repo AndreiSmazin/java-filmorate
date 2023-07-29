@@ -26,6 +26,11 @@ public class FilmController {
         return filmStorage.findAllFilms();
     }
 
+    @GetMapping("/{id}")
+    public Film find(@PathVariable long id) {
+        return filmStorage.findFilm(id);
+    }
+
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         log.info("Получен запрос POST /films c данными: {}", film);
@@ -43,5 +48,10 @@ public class FilmController {
     @DeleteMapping
     public void deleteAll() {
         filmStorage.deleteAllFilms();
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable long id) {
+        filmStorage.deleteFilm(id);
     }
 }

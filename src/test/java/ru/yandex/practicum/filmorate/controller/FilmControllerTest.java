@@ -59,6 +59,23 @@ public class FilmControllerTest {
     }
 
     @Test
+    @DisplayName("GET /films/{id} возвращает HTTP-ответ со статусом 200, типом данных application/json и фильмом " +
+            "в теле")
+
+    void shouldReturnFilm() throws Exception {
+        final Film testFilm = new Film(1, "TestFilm1", "Description",
+                LocalDate.parse("1991-12-25"), 200);
+
+        Mockito.when(filmStorage.findFilm(testFilm.getId())).thenReturn(testFilm);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/films/" + testFilm.getId()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testFilm)));
+    }
+
+    @Test
     @DisplayName("POST /films возвращает HTTP-ответ со статусом 200, типом данных application/json и фильмом в теле")
     void shouldCreateNewFilm() throws Exception {
         final Film testFilm = new Film(0, "TestFilm1", "Description",
@@ -140,6 +157,16 @@ public class FilmControllerTest {
     @DisplayName("DELETE /films возвращает HTTP-ответ со статусом 200")
     void shouldDeleteAllFilms() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/films"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("DELETE /films/{id} возвращает HTTP-ответ со статусом 200")
+    void shouldDeleteFilm() throws Exception {
+        final long testId = 1;
+
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + testId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }

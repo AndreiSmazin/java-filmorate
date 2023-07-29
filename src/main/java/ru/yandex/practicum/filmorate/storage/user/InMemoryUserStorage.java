@@ -23,15 +23,16 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
+    public User findUser(long id) {
+        return users.get(validateId(id));
+    }
+
+    @Override
     public User createNewUser(User user) {
         user.setId(currentId);
         currentId += 1;
 
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-
-        users.put(user.getId(), user);
+        users.put(user.getId(), validateName(user));
         log.info("Добавлен новый пользователь: {}. id={}", user.getName(), user.getId());
 
         return user;
@@ -39,19 +40,36 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User updateUser(User user) {
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.info("Данные пользователя с id={} обновлены.", user.getId());
+        users.put(validateId(user.getId()), validateName(user));
+        log.info("Данные пользователя с id={} обновлены.", user.getId());
 
-            return user;
-        } else {
-            throw new IdNotFoundException("пользователь с заданным id не найден", user.getId(), "пользователь");
-        }
+        return user;
     }
 
     @Override
     public void deleteAllUsers() {
         users.clear();
         log.info("Все пользователи удалены");
+    }
+
+    @Override
+    public void deleteUser(long id) {
+            users.remove(validateId(id));
+            log.info("Пользователь с id={} удален.", id);
+    }
+
+    private long validateId(long id) {
+        if (users.containsKey(id)) {
+            return id;
+        } else {
+            throw new IdNotFoundException("пользователь с заданным id не найден", id, "пользователь");
+        }
+    }
+
+    private User validateName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+        return user;
     }
 }
