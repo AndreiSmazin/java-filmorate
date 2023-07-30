@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,9 @@ public class InMemoryUserStorage implements UserStorage{
         user.setId(currentId);
         currentId += 1;
 
-        users.put(user.getId(), validateName(user));
+        validateName(user);
+        validateFriends(user);
+        users.put(user.getId(), user);
         log.info("Добавлен новый пользователь: {}. id={}", user.getName(), user.getId());
 
         return user;
@@ -40,7 +43,9 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User updateUser(User user) {
-        users.put(validateId(user.getId()), validateName(user));
+        validateName(user);
+        validateFriends(user);
+        users.put(validateId(user.getId()), user);
         log.info("Данные пользователя с id={} обновлены.", user.getId());
 
         return user;
@@ -66,10 +71,15 @@ public class InMemoryUserStorage implements UserStorage{
         }
     }
 
-    private User validateName(User user) {
+    private void validateName(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-        return user;
+    }
+
+    private void validateFriends(User user) {
+        if (user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
+        }
     }
 }

@@ -3,10 +3,10 @@ package ru.yandex.practicum.filmorate.storage.user;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,9 +18,9 @@ public class InMemoryUserStorageTest {
     private final InMemoryUserStorage userStorage = new InMemoryUserStorage();
 
     final User firstUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
-            LocalDate.parse("1991-05-23"));
+            LocalDate.parse("1991-05-23"), new HashSet<>());
     final User secondUser = new User(2,"User2Mail@google.com", "User2", "Petr Petrov",
-            LocalDate.parse("1989-06-01"));
+            LocalDate.parse("1989-06-01"), new HashSet<>());
 
     private void createTestUsers() {
         userStorage.createNewUser(firstUser);
@@ -57,13 +57,13 @@ public class InMemoryUserStorageTest {
 
     @Test
     @DisplayName("Добавляет в хранилище нового пользователя и возвращает его с назначенным id. Если поле name пустое, " +
-            "то назначает ему значение login")
+            "то назначает ему значение login. Если поле friends = null, то назначает ему пустой HashSet")
     void shouldCreateNewUser() throws Exception {
         final User thirdUser = new User(0,"User1Mail@google.com", "User3", "",
-                LocalDate.parse("1991-05-23"));
+                LocalDate.parse("1991-05-23"), null);
         final long expectedId = 3;
         final User expectedUser = new User(3,"User1Mail@google.com", "User3", "User3",
-                LocalDate.parse("1991-05-23"));
+                LocalDate.parse("1991-05-23"), new HashSet<>());
         createTestUsers();
 
         final User reternedUser = userStorage.createNewUser(thirdUser);
@@ -71,6 +71,7 @@ public class InMemoryUserStorageTest {
         assertEquals(expectedId, reternedUser.getId(), "Назначенный пользователю id не соответствует ожидаемому");
         assertEquals(reternedUser.getLogin(), reternedUser.getName(), "Назначенное пользователю name не " +
                 "соответствует ожидаемому");
+        assertFalse(reternedUser.getFriends() == null, "Поле friends не должно быть null");
         assertEquals(expectedUser, userStorage.findUser(expectedId), "Пользователь не добавлен в хранилище");
         assertEquals(expectedUser, reternedUser, "Возвращенный пользователь не соответствует ожидаемому");
     }
@@ -82,9 +83,9 @@ public class InMemoryUserStorageTest {
         final long testId = 2;
         final long wrongTestId = 999;
         final User changedTestUser = new User(2,"ChangedMail@google.com", "User2", "Petr Petrov",
-                LocalDate.parse("1988-06-01"));
+                LocalDate.parse("1988-06-01"), new HashSet<>());
         final User incorrectChangedTestUser = new User(wrongTestId,"ChangedMail@google.com", "User2",
-                "Petr Petrov", LocalDate.parse("1988-06-01"));
+                "Petr Petrov", LocalDate.parse("1988-06-01"), new HashSet<>());
         createTestUsers();
 
         final User reternedUser = userStorage.updateUser(changedTestUser);

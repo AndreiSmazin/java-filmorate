@@ -9,6 +9,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -29,4 +30,6 @@ public class User {
     @NotNull
     @Past
     private final LocalDate birthday; // дата рождения
+
+    private Set<Long> friends; // друзья пользователя
 }
