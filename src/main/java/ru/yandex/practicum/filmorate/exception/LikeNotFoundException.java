@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.exception;
 import lombok.Getter;
 
 @Getter
-public class LikeNotFoundException extends RuntimeException{
+public class LikeNotFoundException extends RuntimeException {
     private final long filmId;
     private final long userID;
 
