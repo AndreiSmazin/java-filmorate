@@ -60,7 +60,7 @@ public class UserServiceTest {
                 () -> userService.addFriend(expectedFirstUser.getId(), expectedFirstUser.getId())
         );
 
-        assertEquals("id пользователя и id друга совпадают",
+        assertEquals("id пользователей совпадают",
                 e.getMessage());
     }
 
