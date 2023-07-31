@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private long currentId = 1;
 
@@ -59,8 +59,8 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public void deleteUser(long id) {
-            users.remove(validateId(id));
-            log.info("Пользователь с id={} удален.", id);
+        users.remove(validateId(id));
+        log.info("Пользователь с id={} удален.", id);
     }
 
     private long validateId(long id) {
