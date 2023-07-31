@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,8 @@ public class InMemoryFilmStorage implements FilmStorage{
     public Film createNewFilm(Film film) {
         film.setId(currentId);
         currentId += 1;
+
+        validateLikes(film);
         films.put(film.getId(), film);
         log.info("Добавлен новый фильм: {}. id={}", film.getName(), film.getId());
 
@@ -39,6 +42,7 @@ public class InMemoryFilmStorage implements FilmStorage{
 
     @Override
     public Film updateFilm(Film film) {
+        validateLikes(film);
         films.put(validateId(film.getId()), film);
         log.info("Данные фильма с id={} обновлены.", film.getId());
 
@@ -62,6 +66,12 @@ public class InMemoryFilmStorage implements FilmStorage{
             return id;
         } else {
             throw new IdNotFoundException("фильм с заданным id не найден", id, "фильм");
+        }
+    }
+
+    private void validateLikes(Film film) {
+        if (film.getLikes() == null) {
+            film.setLikes(new HashSet<>());
         }
     }
 }

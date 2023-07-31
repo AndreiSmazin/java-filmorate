@@ -10,9 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class InMemoryUserStorageTest {
     private final InMemoryUserStorage userStorage = new InMemoryUserStorage();
@@ -71,7 +72,7 @@ public class InMemoryUserStorageTest {
         assertEquals(expectedId, reternedUser.getId(), "Назначенный пользователю id не соответствует ожидаемому");
         assertEquals(reternedUser.getLogin(), reternedUser.getName(), "Назначенное пользователю name не " +
                 "соответствует ожидаемому");
-        assertFalse(reternedUser.getFriends() == null, "Поле friends не должно быть null");
+        assertNotNull(reternedUser.getFriends(), "Поле friends не должно быть null");
         assertEquals(expectedUser, userStorage.findUser(expectedId), "Пользователь не добавлен в хранилище");
         assertEquals(expectedUser, reternedUser, "Возвращенный пользователь не соответствует ожидаемому");
     }

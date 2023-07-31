@@ -6,20 +6,22 @@ import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class InMemoryFilmStorageTest {
     private final InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
 
     final Film firstFilm = new Film(1, "TestFilm1", "Description",
-            LocalDate.parse("1991-12-25"), 200);
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>());
     final Film secondFilm = new Film(2, "TestFilm2", "Description",
-            LocalDate.parse("2020-06-01"), 200);
+            LocalDate.parse("2020-06-01"), 200, new HashSet<>());
 
     private void createTestFilms() {
         filmStorage.createNewFilm(firstFilm);
@@ -54,18 +56,20 @@ public class InMemoryFilmStorageTest {
     }
 
     @Test
-    @DisplayName("Добавляет в хранилище новый фильм и возвращает его с назначенным id")
+    @DisplayName("Добавляет в хранилище новый фильм и возвращает его с назначенным id. Если поле friends = null, то " +
+            "назначает ему пустой HashSet")
     void shouldCreateNewFilm() throws Exception {
         final Film thirdFilm = new Film(0, "TestFilm3", "Description",
-                LocalDate.parse("2019-04-12"), 186);
+                LocalDate.parse("2019-04-12"), 186, null);
         final long expectedId = 3;
         final Film expectedFilm = new Film(expectedId, "TestFilm3", "Description",
-                LocalDate.parse("2019-04-12"), 186);
+                LocalDate.parse("2019-04-12"), 186, new HashSet<>());
         createTestFilms();
 
         final Film reternedFilm = filmStorage.createNewFilm(thirdFilm);
 
         assertEquals(expectedId, reternedFilm.getId(), "Назначенный фильму id не соответствует ожидаемому");
+        assertNotNull(reternedFilm.getLikes(), "Поле likes не должно быть null");
         assertEquals(expectedFilm, filmStorage.findFilm(expectedId), "Фильм не добавлен в хранилище");
         assertEquals(expectedFilm, reternedFilm, "Возвращенный фильм не соответствует ожидаемому");
     }
@@ -77,9 +81,9 @@ public class InMemoryFilmStorageTest {
         final long testId = 2;
         final long wrongTestId = 999;
         final Film changedTestFilm = new Film(testId, "TestFilm2", "New description",
-                LocalDate.parse("2020-06-01"), 195);
+                LocalDate.parse("2020-06-01"), 195, new HashSet<>());
         final Film incorrectChangedTestFilm = new Film(wrongTestId, "TestFilm2", "New description",
-                LocalDate.parse("2020-06-01"), 195);
+                LocalDate.parse("2020-06-01"), 195, new HashSet<>());
         createTestFilms();
 
         final Film reternedFilm = filmStorage.updateFilm(changedTestFilm);

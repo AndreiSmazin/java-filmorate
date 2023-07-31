@@ -75,6 +75,14 @@ public class ErrorHandlingControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("friendId", e.getMessage()));
     }
 
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<Violation> onLikeNotFoundException(LikeNotFoundException e) {
+        log.error("Некорректный запрос: лайк пользователя с id={} не найден в списке лайков фильма с id={}",
+                e.getFilmId(), e.getUserID());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("userId", e.getMessage()));
+    }
+
     private String getFieldName(ConstraintViolation constraintViolation) {
         String[] propertyPath = constraintViolation.getPropertyPath().toString().split("\\.");
         return propertyPath[propertyPath.length - 1];

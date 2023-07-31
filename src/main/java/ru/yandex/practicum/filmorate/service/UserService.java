@@ -66,6 +66,7 @@ public class UserService {
     }
 
     public List<User> findCommonFriends(long userId, long otherUserId) {
+        validateFriendId(userId, otherUserId);
         List<User> commonFriends = userStorage.findUser(userId).getFriends().stream()
                 .filter(id -> userStorage.findUser(otherUserId).getFriends().contains(id))
                 .map(id -> userStorage.findUser(id))
@@ -76,7 +77,7 @@ public class UserService {
 
     private void validateFriendId(long userId, long friendId) {
         if (userId == friendId) {
-            throw new IncorrectFriendIdException("id пользователя и id друга совпадают");
+            throw new IncorrectFriendIdException("id пользователей совпадают");
         }
     }
 }
