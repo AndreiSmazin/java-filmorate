@@ -25,25 +25,25 @@ public class FilmServiceTest {
     private final FilmService filmService = new FilmService(filmStorage, userStorage);
 
     final Film film1 = new Film(1, "TestFilm1", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L)));
     final Film film2 = new Film(2, "TestFilm2", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 2l, 5l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 5L)));
     final Film film3 = new Film(3, "TestFilm3", "Description",
             LocalDate.parse("1991-12-25"), 200, new HashSet<>());
     final Film film4 = new Film(4, "TestFilm4", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 2l, 3l, 5l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L, 5L)));
     final Film film5 = new Film(5, "TestFilm5", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 3l, 4l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 3L, 4L)));
     final Film film6 = new Film(6, "TestFilm6", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 2l, 3l, 4l, 5l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L, 4L, 5L)));
     final Film film7 = new Film(7, "TestFilm7", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 2l, 3l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L)));
     final Film film8 = new Film(8, "TestFilm8", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 4l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 4L)));
     final Film film9 = new Film(9, "TestFilm9", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 3l, 5l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 3L, 5L)));
     final Film film10 = new Film(10, "TestFilm10", "Description",
-            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 2l, 3l, 4l)));
+            LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L, 4L)));
 
     private void createTestFilms() {
         filmStorage.createNewFilm(film1);
@@ -62,13 +62,13 @@ public class FilmServiceTest {
     @DisplayName("Добавляет лайк пользователя в список лайков фильма, возвращает фильм")
     void shouldAddLikeToFilmById() throws Exception {
         final Film expectedFilm = new Film(8, "TestFilm8", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 4l, 6l)));
+                LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 4L, 6L)));
         final long userId = 6;
         createTestFilms();
 
         Mockito.when(userStorage.findUser(userId)).thenReturn(new User(6, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
-                new HashSet<>(List.of(4l))));
+                new HashSet<>(List.of(4L))));
         final Film result = filmService.addLike(expectedFilm.getId(), userId);
 
         assertTrue(filmStorage.findFilm(expectedFilm.getId()).getLikes().contains(userId),
@@ -81,13 +81,13 @@ public class FilmServiceTest {
             "пользователя в списке лайков фильма, возвращает фильм")
     void shouldDeleteLikeOfFilmById() throws Exception {
         final Film expectedFilm = new Film(6, "TestFilm6", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1l, 2l, 3l, 4l)));
+                LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L, 4L)));
         final long userId = 5;
         createTestFilms();
 
         Mockito.when(userStorage.findUser(userId)).thenReturn(new User(5, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
-                new HashSet<>(List.of(4l))));
+                new HashSet<>(List.of(4L))));
         final Film result = filmService.deleteLike(expectedFilm.getId(), userId);
 
         assertFalse(filmStorage.findFilm(expectedFilm.getId()).getLikes().contains(userId),
@@ -97,7 +97,7 @@ public class FilmServiceTest {
         final long wrongUserId = 8;
         Mockito.when(userStorage.findUser(wrongUserId)).thenReturn(new User(8, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
-                new HashSet<>(List.of(4l))));
+                new HashSet<>(List.of(4L))));
 
         final LikeNotFoundException e = assertThrows(
                 LikeNotFoundException.class,

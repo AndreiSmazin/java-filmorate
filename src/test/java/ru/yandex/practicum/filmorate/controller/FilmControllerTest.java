@@ -208,7 +208,7 @@ public class FilmControllerTest {
             "фильмом в теле")
     void shouldAddLikeToFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(10l)));
+                LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(10L)));
         final long userId = 10;
 
         Mockito.when(filmService.addLike(testFilm.getId(), userId)).thenReturn(testFilm);

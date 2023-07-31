@@ -22,13 +22,13 @@ public class UserServiceTest {
     private final UserService userService = new UserService(userStorage);
 
     final User firstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
-            LocalDate.parse("1991-05-23"), new HashSet<>(List.of(3l, 4l)));
+            LocalDate.parse("1991-05-23"), new HashSet<>(List.of(3L, 4L)));
     final User secondUser = new User(2, "User2Mail@google.com", "User2", "Petr Petrov",
             LocalDate.parse("1989-06-01"), new HashSet<>());
     final User thirdUser = new User(3, "User3Mail@google.com", "User3", "Maria Petrova",
-            LocalDate.parse("1978-12-10"), new HashSet<>(List.of(1l, 4l)));
+            LocalDate.parse("1978-12-10"), new HashSet<>(List.of(1L, 4L)));
     final User fourthUser = new User(4, "User4Mail@google.com", "User4", "Irina Stepanova",
-            LocalDate.parse("1996-10-12"), new HashSet<>(List.of(1l, 3l)));
+            LocalDate.parse("1996-10-12"), new HashSet<>(List.of(1L, 3L)));
 
     private void createTestUsers() {
         userStorage.createNewUser(firstUser);
@@ -43,7 +43,7 @@ public class UserServiceTest {
             "возвращает пользователя 1")
     void shouldAddFriendToUserById() throws Exception {
         final User expectedFirstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
-                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(3l, 4l, 2l)));
+                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(3L, 4L, 2L)));
         final long secondUserId = 2;
         createTestUsers();
 
@@ -70,7 +70,7 @@ public class UserServiceTest {
             "возвращает пользователя 1")
     void shouldDeleteFriendOfUserById() throws Exception {
         final User expectedFirstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
-                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(4l)));
+                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(4L)));
         final long secondUserId = 3;
         createTestUsers();
 

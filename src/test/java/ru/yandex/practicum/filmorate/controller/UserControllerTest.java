@@ -204,7 +204,7 @@ public class UserControllerTest {
             "application/json и пользователем в теле")
     void shouldAddNewFriend() throws Exception {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
-                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2l, 4l)));
+                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2L, 4L)));
         final long testFriendId = 4;
 
         Mockito.when(userService.addFriend(testUser.getId(), testFriendId)).thenReturn(testUser);
@@ -239,7 +239,7 @@ public class UserControllerTest {
             "application/json и пользователем в теле")
     void shouldDeleteFriend() throws Exception {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
-                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2l)));
+                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2L)));
         final long testFriendId = 4;
 
         Mockito.when(userService.deleteFriend(testUser.getId(), testFriendId)).thenReturn(testUser);
@@ -275,9 +275,9 @@ public class UserControllerTest {
     void shouldReturnFriends() throws Exception {
         final long testId = 3;
         final User firstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
-                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2l, 3l)));
+                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2L, 3L)));
         final User secondUser = new User(2, "User2Mail@google.com", "User2", "Petr Petrov",
-                LocalDate.parse("1989-06-01"), new HashSet<>(List.of(1l, 3l)));
+                LocalDate.parse("1989-06-01"), new HashSet<>(List.of(1L, 3L)));
 
         final List<User> friends = List.of(firstUser, secondUser);
 
@@ -312,9 +312,9 @@ public class UserControllerTest {
         final long firstTestId = 3;
         final long secondTestId = 4;
         final User firstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
-                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2l, 3l, 4l)));
+                LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2L, 3L, 4L)));
         final User secondUser = new User(2, "User2Mail@google.com", "User2", "Petr Petrov",
-                LocalDate.parse("1989-06-01"), new HashSet<>(List.of(1l, 3l, 4l)));
+                LocalDate.parse("1989-06-01"), new HashSet<>(List.of(1L, 3L, 4L)));
 
         final List<User> friends = List.of(firstUser, secondUser);
 
