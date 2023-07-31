@@ -40,7 +40,7 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Film find(@PathVariable @Min(1) long id) {
+    public Film find(@PathVariable long id) {
         return filmStorage.findFilm(id);
     }
 
@@ -64,19 +64,19 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable @Min(1) long id) {
+    public void deleteById(@PathVariable long id) {
         filmStorage.deleteFilm(id);
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public Film addLikeToFilmById(@PathVariable @Min(1) long filmId, @PathVariable @Min(1) long userId) {
+    public Film addLikeToFilmById(@PathVariable long filmId, @PathVariable long userId) {
         log.info("Получен запрос PUT /films/{}/like/{}", filmId, userId);
 
         return filmService.addLike(filmId, userId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public Film deleteLikeOfFilmById(@PathVariable @Min(1) long filmId, @PathVariable @Min(1) long userId) {
+    public Film deleteLikeOfFilmById(@PathVariable long filmId, @PathVariable long userId) {
         log.info("Получен запрос DELETE /films/{}/like/{}", filmId, userId);
 
         return filmService.deleteLike(filmId, userId);

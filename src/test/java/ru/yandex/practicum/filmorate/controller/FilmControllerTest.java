@@ -78,21 +78,6 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("GET /films/{id} при получении некорректного id возвращает HTTP-ответ со статусом 400 и сообщении об " +
-            "ошибке валидации в теле")
-    void shouldNotReturnFilmWhenIdIncorrect() throws Exception {
-        final long testId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("id", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/films/" + testId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-    }
-
-    @Test
     @DisplayName("POST /films возвращает HTTP-ответ со статусом 200, типом данных application/json и фильмом в теле")
     void shouldCreateNewFilm() throws Exception {
         final Film testFilm = new Film(0, "TestFilm1", "Description",
@@ -189,21 +174,6 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /films/{id} при получении некорректного id возвращает HTTP-ответ со статусом 400 и сообщении об " +
-            "ошибке валидации в теле")
-    void shouldNotDeleteFilmWhenIdIncorrect() throws Exception {
-        final long testId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("id", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + testId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-    }
-
-    @Test
     @DisplayName("PUT /{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200, типом данных application/json и " +
             "фильмом в теле")
     void shouldAddLikeToFilm() throws Exception {
@@ -221,23 +191,6 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /{filmId}/like/{userId} при получении некорректных id возвращает HTTP-ответ со статусом 400 и " +
-            "сообщениями об ошибках валидации в теле")
-    void shouldNotAddLikeToFilmWhenIdIncorrect() throws Exception {
-        final long filmId = 0;
-        final long userId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("filmId", "must be greater than or equal to 1"),
-                new Violation("userId", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/films/" + filmId + "/like/" + userId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-    }
-
-    @Test
     @DisplayName("DELETE /{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200, типом данных application/json и " +
             "фильмом в теле")
     void shouldDeleteLikeOfFilm() throws Exception {
@@ -252,23 +205,6 @@ public class FilmControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testFilm)));
-    }
-
-    @Test
-    @DisplayName("DELETE /{filmId}/like/{userId} при получении некорректных id возвращает HTTP-ответ со статусом 400 и " +
-            "сообщениями об ошибках валидации в теле")
-    void shouldNotDeleteLikeOfFilmWhenIdIncorrect() throws Exception {
-        final long filmId = 0;
-        final long userId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("filmId", "must be greater than or equal to 1"),
-                new Violation("userId", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + filmId + "/like/" + userId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
     }
 
     @Test

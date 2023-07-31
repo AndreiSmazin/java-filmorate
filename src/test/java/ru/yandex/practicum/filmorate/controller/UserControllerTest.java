@@ -78,21 +78,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("GET /users/{id} при получении некорректного id возвращает HTTP-ответ со статусом 400 и сообщении об " +
-            "ошибке валидации в теле")
-    void shouldNotReturnUserWhenIdIncorrect() throws Exception {
-        final long testId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("id", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-    }
-
-    @Test
     @DisplayName("POST /users возвращает HTTP-ответ со статусом 200, типом данных application/json и пользователем " +
             "в теле")
     void shouldCreateNewUser() throws Exception {
@@ -185,21 +170,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /users/{id} при получении некорректного id возвращает HTTP-ответ со статусом 400 и сообщении об " +
-            "ошибке валидации в теле")
-    void shouldNotDeleteUserWhenIdIncorrect() throws Exception {
-        final long testId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("id", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/users/" + testId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-    }
-
-    @Test
     @DisplayName("PUT /users/{userId}/friends/{friendId} возвращает HTTP-ответ со статусом 200, типом данных " +
             "application/json и пользователем в теле")
     void shouldAddNewFriend() throws Exception {
@@ -218,23 +188,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /users/{userId}/friends/{friendId} при получении некорректного id возвращает HTTP-ответ со " +
-            "статусом 400 и сообщении об ошибках валидации в теле")
-    void shouldNotAddNewFriendWhenIdIncorrect() throws Exception {
-        final long firstTestId = 0;
-        final long secondTestId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("userId", "must be greater than or equal to 1"),
-                new Violation("friendId", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/users/" + firstTestId + "/friends/" + secondTestId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-    }
-
-    @Test
     @DisplayName("DELETE /users/{userId}/friends/{friendId} возвращает HTTP-ответ со статусом 200, типом данных " +
             "application/json и пользователем в теле")
     void shouldDeleteFriend() throws Exception {
@@ -250,23 +203,6 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testUser)));
-    }
-
-    @Test
-    @DisplayName("DELETE /users/{userId}/friends/{friendId} при получении некорректных id возвращает HTTP-ответ со " +
-            "статусом 400 и сообщении об ошибках валидации в теле")
-    void shouldNotDeleteFriendWhenIdIncorrect() throws Exception {
-        final long firstTestId = 0;
-        final long secondTestId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("userId", "must be greater than or equal to 1"),
-                new Violation("friendId", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/users/" + firstTestId + "/friends/" + secondTestId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
     }
 
     @Test
@@ -291,21 +227,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("GET /users/{userId}/friends при получении некорректного id возвращает HTTP-ответ со статусом 400 и " +
-            "сообщении об ошибке валидации в теле")
-    void shouldNotReturnFriendsWhenIdIncorrect() throws Exception {
-        final long testId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("userId", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testId + "/friends"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
-    }
-
-    @Test
     @DisplayName("GET /users/{userId}/friends/common/{otherUserId} возвращает HTTP-ответ со статусом 200, типом данных " +
             "application/json и списком общих друзей пользователя в теле")
     void shouldReturnCommonFriends() throws Exception {
@@ -326,23 +247,5 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(friends)));
-    }
-
-    @Test
-    @DisplayName("GET /users/{userId}/friends/common/{otherUserId} при получении некорректных id возвращает HTTP-ответ " +
-            "со статусом 400 и сообщении об ошибках валидации в теле")
-    void shouldNotReturnCommonFriendsWhenIdIncorrect() throws Exception {
-        final long firstTestId = 0;
-        final long secondTestId = 0;
-        final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
-                new Violation("userId", "must be greater than or equal to 1"),
-                new Violation("otherUserId", "must be greater than or equal to 1")));
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + firstTestId + "/friends/common/" +
-                        secondTestId))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
     }
 }

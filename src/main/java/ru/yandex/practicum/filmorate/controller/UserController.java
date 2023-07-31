@@ -16,10 +16,8 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.List;
 
-@Validated
 @RestController
 @RequestMapping("/users")
 @Slf4j
@@ -39,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User find(@PathVariable @Min(1) long id) {
+    public User find(@PathVariable long id) {
         return userStorage.findUser(id);
     }
 
@@ -63,32 +61,32 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable @Min(1) long id) {
+    public void deleteById(@PathVariable long id) {
         userService.deleteAllFriends(id);
         userStorage.deleteUser(id);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
-    public User addFriendById(@PathVariable @Min(1) long userId, @PathVariable @Min(1) long friendId) {
+    public User addFriendById(@PathVariable long userId, @PathVariable long friendId) {
         log.info("Получен запрос PUT /users/{}/friends/{}", userId, friendId);
 
         return userService.addFriend(userId, friendId);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public User deleteFriendById(@PathVariable @Min(1) long userId, @PathVariable @Min(1) long friendId) {
+    public User deleteFriendById(@PathVariable long userId, @PathVariable long friendId) {
         log.info("Получен запрос DELETE /users/{}/friends/{}", userId, friendId);
 
         return userService.deleteFriend(userId, friendId);
     }
 
     @GetMapping("/{userId}/friends")
-    public List<User> findFriendsById(@PathVariable @Min(1) long userId) {
+    public List<User> findFriendsById(@PathVariable long userId) {
         return userService.findFriends(userId);
     }
 
     @GetMapping("/{userId}/friends/common/{otherUserId}")
-    public List<User> findCommonFriendsById(@PathVariable @Min(1) long userId, @PathVariable @Min(1) long otherUserId) {
+    public List<User> findCommonFriendsById(@PathVariable long userId, @PathVariable long otherUserId) {
         return userService.findCommonFriends(userId, otherUserId);
     }
 }
