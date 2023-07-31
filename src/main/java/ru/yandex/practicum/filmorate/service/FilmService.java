@@ -55,9 +55,6 @@ public class FilmService {
     }
 
     private void validateCount(int count) {
-        if (count == 0) {
-            count = 10;
-        }
         if (count > filmStorage.findAllFilms().size()) {
             count = filmStorage.findAllFilms().size();
         }

@@ -3,7 +3,15 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -62,20 +70,20 @@ public class FilmController {
 
     @PutMapping("/{filmId}/like/{userId}")
     public Film addLikeToFilmById(@PathVariable @Min(1) long filmId, @PathVariable @Min(1) long userId) {
-        log.info("Получен запрос PUT {}/like/{}", filmId, userId);
+        log.info("Получен запрос PUT /films/{}/like/{}", filmId, userId);
 
         return filmService.addLike(filmId, userId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public Film deleteLikeOfFilmById(@PathVariable @Min(1) long filmId, @PathVariable @Min(1) long userId) {
-        log.info("Получен запрос DELETE {}/like/{}", filmId, userId);
+        log.info("Получен запрос DELETE /films/{}/like/{}", filmId, userId);
 
         return filmService.deleteLike(filmId, userId);
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "0") @Min(1) int count) {
+    public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") @Min(1) int count) {
         return filmService.getPopularFilms(count);
     }
 }
