@@ -47,7 +47,7 @@ public class UserControllerTest {
     void shouldReturnAllUsers() throws Exception {
         final User firstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
-        final User secondUser = new User(2,"User2Mail@google.com", "User2", "Petr Petrov",
+        final User secondUser = new User(2, "User2Mail@google.com", "User2", "Petr Petrov",
                 LocalDate.parse("1989-06-01"), new HashSet<>());
 
         final List<User> users = List.of(firstUser, secondUser);
@@ -64,9 +64,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("GET /users/{id} возвращает HTTP-ответ со статусом 200, типом данных application/json и " +
             "пользователем в теле")
-
     void shouldReturnUser() throws Exception {
-        final User testUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+        final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
         Mockito.when(userStorage.findUser(1)).thenReturn(testUser);
@@ -97,7 +96,7 @@ public class UserControllerTest {
     @DisplayName("POST /users возвращает HTTP-ответ со статусом 200, типом данных application/json и пользователем " +
             "в теле")
     void shouldCreateNewUser() throws Exception {
-        final User testUser = new User(0,"User1Mail@google.com", "User1", "Ivan Ivanov",
+        final User testUser = new User(0, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
         Mockito.when(userStorage.createNewUser(testUser)).thenReturn(testUser);
@@ -115,7 +114,7 @@ public class UserControllerTest {
     @DisplayName("POST /users при получении некорректных данных возвращает HTTP-ответ со статусом 400 и сообщениями " +
             "об ошибках валидации в теле")
     void shouldNotCreateNewUserWhenDataIncorrect() throws Exception {
-        final User testUser = new User(0,"incorrect mail", "incorrect login", "Ivan Ivanov",
+        final User testUser = new User(0, "incorrect mail", "incorrect login", "Ivan Ivanov",
                 LocalDate.now().plusDays(1), new HashSet<>());
         final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
                 new Violation("email", "must be a well-formed email address"),
@@ -134,7 +133,7 @@ public class UserControllerTest {
     @DisplayName("PUT /users возвращает HTTP-ответ со статусом 200, типом данных application/json и пользователем " +
             "в теле")
     void shouldUpdateUser() throws Exception {
-        final User testUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+        final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
         Mockito.when(userStorage.updateUser(testUser)).thenReturn(testUser);
@@ -152,7 +151,7 @@ public class UserControllerTest {
     @DisplayName("PUT /users при получении некорректных данных возвращает HTTP-ответ со статусом 400 и сообщениями " +
             "об ошибках валидации в теле")
     void shouldNotUpdateUserWhenDataIncorrect() throws Exception {
-        final User testUser = new User(0,"incorrect mail", "incorrect login", "Ivan Ivanov",
+        final User testUser = new User(0, "incorrect mail", "incorrect login", "Ivan Ivanov",
                 LocalDate.now().plusDays(1), new HashSet<>());
         final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
                 new Violation("email", "must be a well-formed email address"),
@@ -204,14 +203,14 @@ public class UserControllerTest {
     @DisplayName("PUT /users/{userId}/friends/{friendId} возвращает HTTP-ответ со статусом 200, типом данных " +
             "application/json и пользователем в теле")
     void shouldAddNewFriend() throws Exception {
-        final User testUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+        final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2l, 4l)));
         final long testFriendId = 4;
 
         Mockito.when(userService.addFriend(testUser.getId(), testFriendId)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/users/" + testUser.getId() + "/friends/" +
-                                testFriendId))
+                        testFriendId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
@@ -239,7 +238,7 @@ public class UserControllerTest {
     @DisplayName("DELETE /users/{userId}/friends/{friendId} возвращает HTTP-ответ со статусом 200, типом данных " +
             "application/json и пользователем в теле")
     void shouldDeleteFriend() throws Exception {
-        final User testUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+        final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2l)));
         final long testFriendId = 4;
 
@@ -277,7 +276,7 @@ public class UserControllerTest {
         final long testId = 3;
         final User firstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2l, 3l)));
-        final User secondUser = new User(2,"User2Mail@google.com", "User2", "Petr Petrov",
+        final User secondUser = new User(2, "User2Mail@google.com", "User2", "Petr Petrov",
                 LocalDate.parse("1989-06-01"), new HashSet<>(List.of(1l, 3l)));
 
         final List<User> friends = List.of(firstUser, secondUser);
@@ -314,7 +313,7 @@ public class UserControllerTest {
         final long secondTestId = 4;
         final User firstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2l, 3l, 4l)));
-        final User secondUser = new User(2,"User2Mail@google.com", "User2", "Petr Petrov",
+        final User secondUser = new User(2, "User2Mail@google.com", "User2", "Petr Petrov",
                 LocalDate.parse("1989-06-01"), new HashSet<>(List.of(1l, 3l, 4l)));
 
         final List<User> friends = List.of(firstUser, secondUser);

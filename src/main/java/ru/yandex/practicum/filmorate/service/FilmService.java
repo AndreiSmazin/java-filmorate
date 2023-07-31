@@ -33,7 +33,7 @@ public class FilmService {
 
     public Film deleteLike(long filmId, long userId) {
         boolean isFound = filmStorage.findFilm(filmId).getLikes().remove(userStorage.findUser(userId).getId());
-        if(!isFound) {
+        if (!isFound) {
             throw new LikeNotFoundException("Лайк пользователя с заданным id не найден в списке лайков фильма " +
                     filmId, filmId, userId);
         }

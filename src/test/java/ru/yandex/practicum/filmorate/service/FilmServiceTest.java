@@ -66,7 +66,7 @@ public class FilmServiceTest {
         final long userId = 6;
         createTestFilms();
 
-        Mockito.when(userStorage.findUser(userId)).thenReturn(new User(6,"User1Mail@google.com",
+        Mockito.when(userStorage.findUser(userId)).thenReturn(new User(6, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
                 new HashSet<>(List.of(4l))));
         final Film result = filmService.addLike(expectedFilm.getId(), userId);
@@ -85,7 +85,7 @@ public class FilmServiceTest {
         final long userId = 5;
         createTestFilms();
 
-        Mockito.when(userStorage.findUser(userId)).thenReturn(new User(5,"User1Mail@google.com",
+        Mockito.when(userStorage.findUser(userId)).thenReturn(new User(5, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
                 new HashSet<>(List.of(4l))));
         final Film result = filmService.deleteLike(expectedFilm.getId(), userId);
@@ -95,7 +95,7 @@ public class FilmServiceTest {
         assertEquals(expectedFilm, result, "Возвращенный фильм не соответствует ожидаемому");
 
         final long wrongUserId = 8;
-        Mockito.when(userStorage.findUser(wrongUserId)).thenReturn(new User(8,"User1Mail@google.com",
+        Mockito.when(userStorage.findUser(wrongUserId)).thenReturn(new User(8, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
                 new HashSet<>(List.of(4l))));
 

@@ -21,13 +21,13 @@ public class UserServiceTest {
     private final UserStorage userStorage = new InMemoryUserStorage();
     private final UserService userService = new UserService(userStorage);
 
-    final User firstUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+    final User firstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
             LocalDate.parse("1991-05-23"), new HashSet<>(List.of(3l, 4l)));
-    final User secondUser = new User(2,"User2Mail@google.com", "User2", "Petr Petrov",
+    final User secondUser = new User(2, "User2Mail@google.com", "User2", "Petr Petrov",
             LocalDate.parse("1989-06-01"), new HashSet<>());
-    final User thirdUser = new User(3,"User3Mail@google.com", "User3", "Maria Petrova",
+    final User thirdUser = new User(3, "User3Mail@google.com", "User3", "Maria Petrova",
             LocalDate.parse("1978-12-10"), new HashSet<>(List.of(1l, 4l)));
-    final User fourthUser = new User(4,"User4Mail@google.com", "User4", "Irina Stepanova",
+    final User fourthUser = new User(4, "User4Mail@google.com", "User4", "Irina Stepanova",
             LocalDate.parse("1996-10-12"), new HashSet<>(List.of(1l, 3l)));
 
     private void createTestUsers() {
@@ -42,7 +42,7 @@ public class UserServiceTest {
             "пользователя 1, выбрасывает исключение при попытке добавить пользователя в собственный список друзей, " +
             "возвращает пользователя 1")
     void shouldAddFriendToUserById() throws Exception {
-        final User expectedFirstUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+        final User expectedFirstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>(List.of(3l, 4l, 2l)));
         final long secondUserId = 2;
         createTestUsers();
@@ -69,7 +69,7 @@ public class UserServiceTest {
             "пользователя 2, выбрасывает исключение при отсутствии пользователя 2 в списке друзей пользователя 1, " +
             "возвращает пользователя 1")
     void shouldDeleteFriendOfUserById() throws Exception {
-        final User expectedFirstUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+        final User expectedFirstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>(List.of(4l)));
         final long secondUserId = 3;
         createTestUsers();

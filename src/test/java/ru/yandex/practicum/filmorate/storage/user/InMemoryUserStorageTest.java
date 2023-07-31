@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class InMemoryUserStorageTest {
     private final InMemoryUserStorage userStorage = new InMemoryUserStorage();
 
-    final User firstUser = new User(1,"User1Mail@google.com", "User1", "Ivan Ivanov",
+    final User firstUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
             LocalDate.parse("1991-05-23"), new HashSet<>());
-    final User secondUser = new User(2,"User2Mail@google.com", "User2", "Petr Petrov",
+    final User secondUser = new User(2, "User2Mail@google.com", "User2", "Petr Petrov",
             LocalDate.parse("1989-06-01"), new HashSet<>());
 
     private void createTestUsers() {
@@ -60,10 +60,10 @@ public class InMemoryUserStorageTest {
     @DisplayName("Добавляет в хранилище нового пользователя и возвращает его с назначенным id. Если поле name пустое, " +
             "то назначает ему значение login. Если поле friends = null, то назначает ему пустой HashSet")
     void shouldCreateNewUser() throws Exception {
-        final User thirdUser = new User(0,"User1Mail@google.com", "User3", "",
+        final User thirdUser = new User(0, "User1Mail@google.com", "User3", "",
                 LocalDate.parse("1991-05-23"), null);
         final long expectedId = 3;
-        final User expectedUser = new User(3,"User1Mail@google.com", "User3", "User3",
+        final User expectedUser = new User(3, "User1Mail@google.com", "User3", "User3",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
         createTestUsers();
 
@@ -83,9 +83,9 @@ public class InMemoryUserStorageTest {
     void shouldUpdateUser() throws Exception {
         final long testId = 2;
         final long wrongTestId = 999;
-        final User changedTestUser = new User(2,"ChangedMail@google.com", "User2", "Petr Petrov",
+        final User changedTestUser = new User(2, "ChangedMail@google.com", "User2", "Petr Petrov",
                 LocalDate.parse("1988-06-01"), new HashSet<>());
-        final User incorrectChangedTestUser = new User(wrongTestId,"ChangedMail@google.com", "User2",
+        final User incorrectChangedTestUser = new User(wrongTestId, "ChangedMail@google.com", "User2",
                 "Petr Petrov", LocalDate.parse("1988-06-01"), new HashSet<>());
         createTestUsers();
 

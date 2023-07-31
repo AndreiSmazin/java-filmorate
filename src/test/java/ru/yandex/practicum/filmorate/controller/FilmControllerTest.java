@@ -64,7 +64,6 @@ public class FilmControllerTest {
     @Test
     @DisplayName("GET /films/{id} возвращает HTTP-ответ со статусом 200, типом данных application/json и фильмом " +
             "в теле")
-
     void shouldReturnFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
