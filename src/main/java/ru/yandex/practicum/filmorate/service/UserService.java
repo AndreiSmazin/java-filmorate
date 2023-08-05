@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectFriendIdException;
+import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,68 +17,85 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserStorage userStorage;
 
-    @Autowired
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
     public User addFriend(long userId, long friendId) {
+        log.debug("Вызван метод 'addFriend' с параметрами userId={}, friendId={}", userId, friendId);
+
         validateFriendId(userId, friendId);
-        userStorage.findUser(userId).getFriends().add(userStorage.findUser(friendId).getId());
-        log.info("В список друзей пользователя {} добавлен пользователь {}", userId, friendId);
+        User user = validateUserOnNotNull(userStorage.findUser(userId));
+        User friend = validateUserOnNotNull(userStorage.findUser(friendId));
 
-        userStorage.findUser(friendId).getFriends().add(userId);
-        log.info("В список друзей пользователя {} добавлен пользователь {}", friendId, userId);
+        user.getFriends().add(friendId);
+        friend.getFriends().add(userId);
 
-        return userStorage.findUser(userId);
+        log.debug("Метод 'addFriend' вернул: {}", user);
+        return user;
     }
 
     public User deleteFriend(long userId, long friendId) {
+        log.debug("Вызван метод delete Friend' с параметрами userId={}, friendId={}", userId, friendId);
+
         validateFriendId(userId, friendId);
-        boolean isFound = userStorage.findUser(userId).getFriends().remove(userStorage.findUser(friendId).getId());
+        User user = validateUserOnNotNull(userStorage.findUser(userId));
+        User friend = validateUserOnNotNull(userStorage.findUser(friendId));
+
+        boolean isFound = user.getFriends().remove(friendId);
         if (!isFound) {
             throw new FriendNotFoundException("пользователь с заданным id не найден в списке друзей пользователя " +
                     userId, userId, friendId);
         }
+        friend.getFriends().remove(userId);
 
-        userStorage.findUser(friendId).getFriends().remove(userId);
-        log.info("Пользователь {} удален из списка друзей пользователя {}", friendId, userId);
-        log.info("Пользователь {} удален из списка друзей пользователя {}", userId, friendId);
-
-        return userStorage.findUser(userId);
+        log.debug("Метод 'deleteFriend' вернул: {}", user);
+        return user;
     }
 
     public void deleteAllFriends(long userId) {
-        for (long friendId : userStorage.findUser(userId).getFriends()) {
+        log.debug("Вызван метод delete Friend' с параметром userId={}", userId);
+
+        User user = validateUserOnNotNull(userStorage.findUser(userId));
+
+        for (long friendId : user.getFriends()) {
             userStorage.findUser(friendId).getFriends().remove(userId);
-            log.info("Пользователь {} удален из списка друзей пользователя {}", userId, friendId);
         }
 
-        userStorage.findUser(userId).getFriends().clear();
-        log.info("Список друзей пользователя {} очищен", userId);
+        user.getFriends().clear();
+        log.debug("Метод 'deleteAllFriends' вернул: {}", user);
     }
 
     public List<User> findFriends(long userId) {
-        List<User> friends = userStorage.findUser(userId).getFriends().stream()
-                .map(id -> userStorage.findUser(id))
-                .collect(Collectors.toList());
+        User user = validateUserOnNotNull(userStorage.findUser(userId));
 
-        return friends;
+        return userStorage.findUsers(new ArrayList<>(user.getFriends()));
     }
 
     public List<User> findCommonFriends(long userId, long otherUserId) {
         validateFriendId(userId, otherUserId);
-        List<User> commonFriends = userStorage.findUser(userId).getFriends().stream()
-                .filter(id -> userStorage.findUser(otherUserId).getFriends().contains(id))
-                .map(id -> userStorage.findUser(id))
+
+        User user = validateUserOnNotNull(userStorage.findUser(userId));
+        User otherUser = validateUserOnNotNull(userStorage.findUser(otherUserId));
+
+        List<Long> commonFriends = user.getFriends().stream()
+                .filter(id -> otherUser.getFriends().contains(id))
                 .collect(Collectors.toList());
 
-        return commonFriends;
+        return userStorage.findUsers(commonFriends);
     }
 
     private void validateFriendId(long userId, long friendId) {
         if (userId == friendId) {
             throw new IncorrectFriendIdException("id пользователей совпадают");
         }
+    }
+
+    private User validateUserOnNotNull(User user) {
+        if (user == null) {
+            throw new NullObjectException("Полученый из хранилища User оказался null");
+        }
+
+        return user;
     }
 }

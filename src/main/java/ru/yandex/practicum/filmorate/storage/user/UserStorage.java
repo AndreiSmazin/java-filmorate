@@ -9,6 +9,8 @@ public interface UserStorage {
 
     public User findUser(long id);
 
+    public List<User> findUsers(List<Long> ids);
+
     public User createNewUser(User user);
 
     public User updateUser(User user);

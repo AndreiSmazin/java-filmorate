@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
@@ -20,7 +19,6 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
@@ -30,6 +28,7 @@ public class FilmService {
         log.debug("Вызван метод 'addLike' с параметрами filmId={}, userId={}", filmId, userId);
 
         Film targetFilm = validateFilmOnNotNull(filmStorage.findFilm(filmId));
+
         targetFilm.getLikes().add(validateUserOnNotNull(userStorage.findUser(userId)).getId());
 
         log.debug("Метод 'addLike' вернул: {}", targetFilm);
@@ -40,6 +39,7 @@ public class FilmService {
         log.debug("Вызван метод 'deleteLike' с параметрами filmId={}, userId={}", filmId, userId);
 
         Film targetFilm = validateFilmOnNotNull(filmStorage.findFilm(filmId));
+
         boolean isFound = targetFilm.getLikes().remove(userId);
         if (!isFound) {
             throw new LikeNotFoundException("Лайк пользователя с заданным id не найден в списке лайков фильма " +
@@ -51,13 +51,11 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(int count) {
-        List<Film> filmsSortedByRating = filmStorage.findAllFilms().stream()
+        return filmStorage.findAllFilms().stream()
                 .sorted(Comparator.comparing((Film film) -> film.getLikes().size()).reversed()
                         .thenComparing(Film::getId))
                 .limit(count)
                 .collect(Collectors.toList());
-
-        return filmsSortedByRating;
     }
 
     private Film validateFilmOnNotNull(Film film) {

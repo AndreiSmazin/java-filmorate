@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -26,6 +27,13 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User findUser(long id) {
         return users.get(validateId(id));
+    }
+
+    @Override
+    public List<User> findUsers(List<Long> ids) {
+        return ids.stream()
+                .map(id -> checkNull(users.get(id)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -81,5 +89,13 @@ public class InMemoryUserStorage implements UserStorage {
         if (user.getFriends() == null) {
             user.setFriends(new HashSet<>());
         }
+    }
+
+    private User checkNull(User user)  {
+        if (user == null) {
+            throw new IdNotFoundException("пользователь с заданным id не найден", user.getId(), "пользователь");
+        }
+
+        return user;
     }
 }
