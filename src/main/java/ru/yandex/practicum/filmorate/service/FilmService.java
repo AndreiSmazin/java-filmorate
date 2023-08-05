@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -25,26 +27,30 @@ public class FilmService {
     }
 
     public Film addLike(long filmId, long userId) {
-        filmStorage.findFilm(filmId).getLikes().add(userStorage.findUser(userId).getId());
-        log.info("В список лайков фильма {} добавлен лайк пользователя {}", filmId, userId);
+        log.debug("Вызван метод 'addLike' с параметрами filmId={}, userId={}", filmId, userId);
 
-        return filmStorage.findFilm(filmId);
+        Film targetFilm = validateFilmOnNotNull(filmStorage.findFilm(filmId));
+        targetFilm.getLikes().add(validateUserOnNotNull(userStorage.findUser(userId)).getId());
+
+        log.debug("Метод 'addLike' вернул: {}", targetFilm);
+        return targetFilm;
     }
 
     public Film deleteLike(long filmId, long userId) {
-        boolean isFound = filmStorage.findFilm(filmId).getLikes().remove(userStorage.findUser(userId).getId());
+        log.debug("Вызван метод 'deleteLike' с параметрами filmId={}, userId={}", filmId, userId);
+
+        Film targetFilm = validateFilmOnNotNull(filmStorage.findFilm(filmId));
+        boolean isFound = targetFilm.getLikes().remove(userId);
         if (!isFound) {
             throw new LikeNotFoundException("Лайк пользователя с заданным id не найден в списке лайков фильма " +
                     filmId, filmId, userId);
         }
-        log.info("Лайк пользователя {} удален из списка лайков фильма {}", filmId, userId);
 
-        return filmStorage.findFilm(filmId);
+        log.debug("Метод 'deleteLike' вернул: {}", targetFilm);
+        return targetFilm;
     }
 
     public List<Film> getPopularFilms(int count) {
-        validateCount(count);
-
         List<Film> filmsSortedByRating = filmStorage.findAllFilms().stream()
                 .sorted(Comparator.comparing((Film film) -> film.getLikes().size()).reversed()
                         .thenComparing(Film::getId))
@@ -54,9 +60,19 @@ public class FilmService {
         return filmsSortedByRating;
     }
 
-    private void validateCount(int count) {
-        if (count > filmStorage.findAllFilms().size()) {
-            count = filmStorage.findAllFilms().size();
+    private Film validateFilmOnNotNull(Film film) {
+        if (film == null) {
+            throw new NullObjectException("Полученый из хранилища Film оказался null");
         }
+
+        return film;
+    }
+
+    private User validateUserOnNotNull(User user) {
+        if (user == null) {
+            throw new NullObjectException("Полученый из хранилища User оказался null");
+        }
+
+        return user;
     }
 }

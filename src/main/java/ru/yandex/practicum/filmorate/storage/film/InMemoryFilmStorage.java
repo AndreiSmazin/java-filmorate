@@ -25,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film findFilm(long id) {
-        return films.get(validateId(id));
+        return checkNull(films.get(id));
     }
 
     @Override
@@ -67,6 +67,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             throw new IdNotFoundException("фильм с заданным id не найден", id, "фильм");
         }
+    }
+
+    private Film checkNull(Film film)  {
+        if (film == null) {
+            throw new IdNotFoundException("фильм с заданным id не найден", film.getId(), "фильм");
+        }
+
+        return film;
     }
 
     private void validateLikes(Film film) {

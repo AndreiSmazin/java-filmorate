@@ -113,7 +113,7 @@ public class FilmServiceTest {
     void shouldReturnSortedByRatingFilms() throws Exception {
         final List<Film> expectedList = List.of(film6, film4, film10, film2, film5);
         createTestFilms();
-        System.out.println(filmService.getPopularFilms(5));
+
         assertEquals(expectedList, filmService.getPopularFilms(5), "Возвращенный список не " +
                 "соответствует ожидаемому");
     }
