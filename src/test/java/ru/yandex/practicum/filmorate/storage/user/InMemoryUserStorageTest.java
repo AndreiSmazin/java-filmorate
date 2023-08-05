@@ -57,6 +57,16 @@ public class InMemoryUserStorageTest {
     }
 
     @Test
+    @DisplayName("Возвращает список пользователей по списку id")
+    void shouldReturnUsers() throws Exception {
+        final List<Long> testIds = List.of(1L, 2L);
+        final List<User> expectedUsers = List.of(firstUser, secondUser);
+        createTestUsers();
+
+        assertEquals(expectedUsers, userStorage.findUsers(testIds), "Список пользователей не совпадает с ожидаемым");
+    }
+
+    @Test
     @DisplayName("Добавляет в хранилище нового пользователя и возвращает его с назначенным id. Если поле name пустое, " +
             "то назначает ему значение login. Если поле friends = null, то назначает ему пустой HashSet")
     void shouldCreateNewUser() throws Exception {

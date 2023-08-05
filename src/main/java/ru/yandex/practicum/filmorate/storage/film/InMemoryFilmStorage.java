@@ -25,53 +25,57 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film findFilm(long id) {
-        return checkNull(films.get(id));
+        return validateFilmOnNotNull(films.get(id));
     }
 
     @Override
     public Film createNewFilm(Film film) {
+        log.debug("Вызван метод 'createNewFilm' с параметром film={}", film);
+
         film.setId(currentId);
         currentId += 1;
 
         validateLikes(film);
         films.put(film.getId(), film);
-        log.info("Добавлен новый фильм: {}. id={}", film.getName(), film.getId());
 
+        log.debug("Метод 'createNewFilm' вернул: {}", film);
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        validateLikes(film);
-        films.put(validateId(film.getId()), film);
-        log.info("Данные фильма с id={} обновлены.", film.getId());
+        log.debug("Вызван метод 'updateFilm' с параметром film={}", film);
 
-        return film;
+        Film targetFilm = validateFilmOnNotNull(films.get(film.getId()));
+
+        validateLikes(film);
+
+        targetFilm.setName(film.getName());
+        targetFilm.setDescription(film.getDescription());
+        targetFilm.setReleaseDate(film.getReleaseDate());
+        targetFilm.setDuration(film.getDuration());
+
+        log.debug("Метод 'updateFilm' вернул: {}", film);
+        return targetFilm;
     }
 
     @Override
     public void deleteAllFilms() {
+        log.debug("Вызван метод 'deleteAllFilms'");
+
         films.clear();
-        log.info("Все фильмы удалены");
     }
 
     @Override
     public void deleteFilm(long id) {
-        films.remove(validateId(id));
-        log.info("Фильм с id={} удален.", id);
+        log.debug("Вызван метод 'deleteFilm' с параметром id={}", id);
+
+        films.remove(validateFilmOnNotNull(films.get(id)).getId());
     }
 
-    private long validateId(long id) {
-        if (films.containsKey(id)) {
-            return id;
-        } else {
-            throw new IdNotFoundException("фильм с заданным id не найден", id, "фильм");
-        }
-    }
-
-    private Film checkNull(Film film)  {
+    private Film validateFilmOnNotNull(Film film)  {
         if (film == null) {
-            throw new IdNotFoundException("фильм с заданным id не найден", film.getId(), "фильм");
+            throw new IdNotFoundException("фильм с заданным id не найден", "фильм");
         }
 
         return film;

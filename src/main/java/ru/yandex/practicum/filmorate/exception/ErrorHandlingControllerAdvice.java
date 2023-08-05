@@ -55,7 +55,7 @@ public class ErrorHandlingControllerAdvice {
 
     @ExceptionHandler(IdNotFoundException.class)
     public ResponseEntity<Violation> onIdNotFoundException(IdNotFoundException e) {
-        log.error("Некорректный запрос: {} с id={} не найден", e.getItemType(), e.getId());
+        log.error("Некорректный запрос: {} не найден", e.getItemType());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("id", e.getMessage()));
     }

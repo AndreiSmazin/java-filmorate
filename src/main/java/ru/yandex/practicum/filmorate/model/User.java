@@ -18,18 +18,18 @@ public class User {
 
     @NotNull
     @Email
-    private final String email; // адрес электронной почты
+    private String email; // адрес электронной почты
 
     @NotNull
     @CorrectLogin
-    private final String login; // логин
+    private String login; // логин
 
     private String name; // имя
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @NotNull
     @Past
-    private final LocalDate birthday; // дата рождения
+    private LocalDate birthday; // дата рождения
 
     private Set<Long> friends; // друзья пользователя
 }

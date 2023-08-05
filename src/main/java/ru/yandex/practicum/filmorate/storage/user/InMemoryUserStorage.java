@@ -26,57 +26,61 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User findUser(long id) {
-        return users.get(validateId(id));
+        return validateUserOnNotNull(users.get(id));
     }
 
     @Override
     public List<User> findUsers(List<Long> ids) {
         return ids.stream()
-                .map(id -> checkNull(users.get(id)))
+                .map(id -> validateUserOnNotNull(users.get(id)))
                 .collect(Collectors.toList());
     }
 
     @Override
     public User createNewUser(User user) {
+        log.debug("Вызван метод 'createNewUser' с параметром user={}", user);
+
         user.setId(currentId);
         currentId += 1;
 
         validateName(user);
         validateFriends(user);
         users.put(user.getId(), user);
-        log.info("Добавлен новый пользователь: {}. id={}", user.getName(), user.getId());
 
+        log.debug("Метод 'createNewUser' вернул: {}", user);
         return user;
     }
 
     @Override
     public User updateUser(User user) {
+        log.debug("Вызван метод 'updateUser' с параметром user={}", user);
+
+        User targetUser = validateUserOnNotNull(users.get(user.getId()));
+
         validateName(user);
         validateFriends(user);
-        users.put(validateId(user.getId()), user);
-        log.info("Данные пользователя с id={} обновлены.", user.getId());
 
-        return user;
+        targetUser.setEmail(user.getEmail());
+        targetUser.setLogin(user.getLogin());
+        targetUser.setName(user.getName());
+        targetUser.setBirthday(user.getBirthday());
+
+        log.debug("Метод 'updateUser' вернул: {}", targetUser);
+        return targetUser;
     }
 
     @Override
     public void deleteAllUsers() {
+        log.debug("Вызван метод 'deleteAllUsers'");
+
         users.clear();
-        log.info("Все пользователи удалены");
     }
 
     @Override
     public void deleteUser(long id) {
-        users.remove(validateId(id));
-        log.info("Пользователь с id={} удален.", id);
-    }
+        log.debug("Вызван метод 'deleteUser' с параметром id={}", id);
 
-    private long validateId(long id) {
-        if (users.containsKey(id)) {
-            return id;
-        } else {
-            throw new IdNotFoundException("пользователь с заданным id не найден", id, "пользователь");
-        }
+        users.remove(validateUserOnNotNull(users.get(id)).getId());
     }
 
     private void validateName(User user) {
@@ -91,9 +95,9 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
-    private User checkNull(User user)  {
+    private User validateUserOnNotNull(User user)  {
         if (user == null) {
-            throw new IdNotFoundException("пользователь с заданным id не найден", user.getId(), "пользователь");
+            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
         }
 
         return user;

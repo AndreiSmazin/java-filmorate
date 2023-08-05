@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public User deleteFriend(long userId, long friendId) {
-        log.debug("Вызван метод delete Friend' с параметрами userId={}, friendId={}", userId, friendId);
+        log.debug("Вызван метод 'deleteFriend' с параметрами userId={}, friendId={}", userId, friendId);
 
         validateFriendId(userId, friendId);
         User user = validateUserOnNotNull(userStorage.findUser(userId));
@@ -54,12 +54,13 @@ public class UserService {
     }
 
     public void deleteAllFriends(long userId) {
-        log.debug("Вызван метод delete Friend' с параметром userId={}", userId);
+        log.debug("Вызван метод 'deleteAllFriends' с параметром userId={}", userId);
 
         User user = validateUserOnNotNull(userStorage.findUser(userId));
+        List<User> friends = userStorage.findUsers(new ArrayList<>(user.getFriends()));
 
-        for (long friendId : user.getFriends()) {
-            userStorage.findUser(friendId).getFriends().remove(userId);
+        for (User friend : friends) {
+            friend.getFriends().remove(userId);
         }
 
         user.getFriends().clear();
