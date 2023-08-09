@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
