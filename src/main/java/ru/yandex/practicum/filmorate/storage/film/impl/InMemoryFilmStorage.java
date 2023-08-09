@@ -1,15 +1,17 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.film.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -24,13 +26,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film findFilm(long id) {
-        return validateFilmOnNotNull(films.get(id));
+    public Optional<Film> findFilm(long id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
     public Film createNewFilm(Film film) {
-        log.debug("Вызван метод 'createNewFilm' с параметром film={}", film);
+        log.debug("+ createNewFilm: {}", film);
 
         film.setId(currentId);
         currentId += 1;
@@ -38,15 +40,17 @@ public class InMemoryFilmStorage implements FilmStorage {
         validateLikes(film);
         films.put(film.getId(), film);
 
-        log.debug("Метод 'createNewFilm' вернул: {}", film);
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        log.debug("Вызван метод 'updateFilm' с параметром film={}", film);
+        log.debug("+ updateFilm: {}", film);
 
-        Film targetFilm = validateFilmOnNotNull(films.get(film.getId()));
+        Film targetFilm = films.get(film.getId());
+        if (targetFilm == null) {
+            throw new IdNotFoundException("фильм с заданным id не найден", "фильм");
+        }
 
         validateLikes(film);
 
@@ -55,30 +59,24 @@ public class InMemoryFilmStorage implements FilmStorage {
         targetFilm.setReleaseDate(film.getReleaseDate());
         targetFilm.setDuration(film.getDuration());
 
-        log.debug("Метод 'updateFilm' вернул: {}", film);
         return targetFilm;
     }
 
     @Override
     public void deleteAllFilms() {
-        log.debug("Вызван метод 'deleteAllFilms'");
+        log.debug("+ deleteAllFilms");
 
         films.clear();
     }
 
     @Override
     public void deleteFilm(long id) {
-        log.debug("Вызван метод 'deleteFilm' с параметром id={}", id);
+        log.debug("+ deleteFilm: {}", id);
 
-        films.remove(validateFilmOnNotNull(films.get(id)).getId());
-    }
-
-    private Film validateFilmOnNotNull(Film film)  {
-        if (film == null) {
+        Film targetFilm = films.remove(id);
+        if (targetFilm == null) {
             throw new IdNotFoundException("фильм с заданным id не найден", "фильм");
         }
-
-        return film;
     }
 
     private void validateLikes(Film film) {

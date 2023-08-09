@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectFriendIdException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.impl.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
@@ -47,13 +47,12 @@ public class UserServiceTest {
         final long secondUserId = 2;
         createTestUsers();
 
-        final User result = userService.addFriend(expectedFirstUser.getId(), secondUserId);
+        userService.addFriend(expectedFirstUser.getId(), secondUserId);
 
-        assertTrue(userStorage.findUser(expectedFirstUser.getId()).getFriends().contains(secondUserId),
+        assertTrue(userStorage.findUser(expectedFirstUser.getId()).get().getFriends().contains(secondUserId),
                 "Пользователь 2 не добавлен в список друзей пользователя 1");
-        assertTrue(userStorage.findUser(secondUserId).getFriends().contains(expectedFirstUser.getId()),
+        assertTrue(userStorage.findUser(secondUserId).get().getFriends().contains(expectedFirstUser.getId()),
                 "Пользователь 1 не добавлен в список друзей пользователя 2");
-        assertEquals(expectedFirstUser, result, "Возвращенный пользователь не соответствует ожидаемому");
 
         final IncorrectFriendIdException e = assertThrows(
                 IncorrectFriendIdException.class,
@@ -74,13 +73,12 @@ public class UserServiceTest {
         final long secondUserId = 3;
         createTestUsers();
 
-        final User result = userService.deleteFriend(expectedFirstUser.getId(), secondUserId);
+        userService.deleteFriend(expectedFirstUser.getId(), secondUserId);
 
-        assertFalse(userStorage.findUser(expectedFirstUser.getId()).getFriends().contains(secondUserId),
+        assertFalse(userStorage.findUser(expectedFirstUser.getId()).get().getFriends().contains(secondUserId),
                 "Пользователь 2 не удален из списка друзей пользователя 1");
-        assertFalse(userStorage.findUser(secondUserId).getFriends().contains(expectedFirstUser.getId()),
+        assertFalse(userStorage.findUser(secondUserId).get().getFriends().contains(expectedFirstUser.getId()),
                 "Пользователь 1 не удален из списка друзей пользователя 2");
-        assertEquals(expectedFirstUser, result, "Возвращенный пользователь не соответствует ожидаемому");
 
         final long wrongTestFriendId = 2;
         final FriendNotFoundException e = assertThrows(
@@ -102,11 +100,11 @@ public class UserServiceTest {
 
         userService.deleteAllFriends(firstUserId);
 
-        assertTrue(userStorage.findUser(firstUserId).getFriends().isEmpty(), "Список друзей пользователя 1 не " +
+        assertTrue(userStorage.findUser(firstUserId).get().getFriends().isEmpty(), "Список друзей пользователя 1 не " +
                 "очищен");
-        assertFalse(userStorage.findUser(secondUserId).getFriends().contains(firstUserId),
+        assertFalse(userStorage.findUser(secondUserId).get().getFriends().contains(firstUserId),
                 "Пользователь 1 не удален из списка друзей пользователя 2");
-        assertFalse(userStorage.findUser(thirdUserId).getFriends().contains(firstUserId),
+        assertFalse(userStorage.findUser(thirdUserId).get().getFriends().contains(firstUserId),
                 "Пользователь 1 не удален из списка друзей пользователя 3");
     }
 

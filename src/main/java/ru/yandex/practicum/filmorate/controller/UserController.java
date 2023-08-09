@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -37,46 +38,45 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User find(@PathVariable long id) {
-        return userStorage.findUser(id);
+        return userStorage.findUser(id).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        log.info("Получен запрос POST /users c данными: {}", user);
-
+        log.info("Received POST-request /users with body: {}", user);
         return userStorage.createNewUser(user);
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
-        log.info("Получен запрос PUT /users c данными: {}", user);
-
+        log.info("Received PUT-request /users with body: {}", user);
         return userStorage.updateUser(user);
     }
 
     @DeleteMapping
     public void deleteAll() {
+        log.info("Received DELETE-request /users");
         userStorage.deleteAllUsers();
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable long id) {
+        log.info("Received DELETE-request /users/{}", id);
         userService.deleteAllFriends(id);
         userStorage.deleteUser(id);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
-    public User addFriendById(@PathVariable long userId, @PathVariable long friendId) {
-        log.info("Получен запрос PUT /users/{}/friends/{}", userId, friendId);
-
-        return userService.addFriend(userId, friendId);
+    public void addFriendById(@PathVariable long userId, @PathVariable long friendId) {
+        log.info("Received PUT-request /users/{}/friends/{}", userId, friendId);
+        userService.addFriend(userId, friendId);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public User deleteFriendById(@PathVariable long userId, @PathVariable long friendId) {
-        log.info("Получен запрос DELETE /users/{}/friends/{}", userId, friendId);
-
-        return userService.deleteFriend(userId, friendId);
+    public void deleteFriendById(@PathVariable long userId, @PathVariable long friendId) {
+        log.info("Received DELETE-request /users/{}/friends/{}", userId, friendId);
+        userService.deleteFriend(userId, friendId);
     }
 
     @GetMapping("/{userId}/friends")

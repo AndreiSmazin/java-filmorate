@@ -1,15 +1,17 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.user.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,20 +27,26 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findUser(long id) {
-        return validateUserOnNotNull(users.get(id));
+    public Optional<User> findUser(long id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
     public List<User> findUsers(List<Long> ids) {
         return ids.stream()
-                .map(id -> validateUserOnNotNull(users.get(id)))
+                .map(id -> {
+                    User user = users.get(id);
+                    if (user == null) {
+                        throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
+                    }
+                    return user;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public User createNewUser(User user) {
-        log.debug("Вызван метод 'createNewUser' с параметром user={}", user);
+        log.debug("+ createNewUser: {}", user);
 
         user.setId(currentId);
         currentId += 1;
@@ -47,15 +55,17 @@ public class InMemoryUserStorage implements UserStorage {
         validateFriends(user);
         users.put(user.getId(), user);
 
-        log.debug("Метод 'createNewUser' вернул: {}", user);
         return user;
     }
 
     @Override
     public User updateUser(User user) {
-        log.debug("Вызван метод 'updateUser' с параметром user={}", user);
+        log.debug("+ updateUser: {}", user);
 
-        User targetUser = validateUserOnNotNull(users.get(user.getId()));
+        User targetUser = users.get(user.getId());
+        if (targetUser == null) {
+            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
+        }
 
         validateName(user);
         validateFriends(user);
@@ -65,22 +75,24 @@ public class InMemoryUserStorage implements UserStorage {
         targetUser.setName(user.getName());
         targetUser.setBirthday(user.getBirthday());
 
-        log.debug("Метод 'updateUser' вернул: {}", targetUser);
         return targetUser;
     }
 
     @Override
     public void deleteAllUsers() {
-        log.debug("Вызван метод 'deleteAllUsers'");
+        log.debug("+ deleteAllUsers");
 
         users.clear();
     }
 
     @Override
     public void deleteUser(long id) {
-        log.debug("Вызван метод 'deleteUser' с параметром id={}", id);
+        log.debug("+ deleteUser: {}", id);
 
-        users.remove(validateUserOnNotNull(users.get(id)).getId());
+        User targetUser = users.remove(id);
+        if (targetUser == null) {
+            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
+        }
     }
 
     private void validateName(User user) {
@@ -93,13 +105,5 @@ public class InMemoryUserStorage implements UserStorage {
         if (user.getFriends() == null) {
             user.setFriends(new HashSet<>());
         }
-    }
-
-    private User validateUserOnNotNull(User user)  {
-        if (user == null) {
-            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
-        }
-
-        return user;
     }
 }

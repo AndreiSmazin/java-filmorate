@@ -4,10 +4,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.impl.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -38,22 +40,16 @@ public class InMemoryUserStorageTest {
     }
 
     @Test
-    @DisplayName("Возвращает пользователя по заданному id, выбрасывает исключение если пользователь с заданным id " +
+    @DisplayName("Возвращает пользователя по заданному id, возвращает пустой Optional если пользователь с заданным id " +
             "отсутствует")
     void shouldReturnUserById() throws Exception {
         final long testId = 2;
         final long wrongTestId = 999;
         createTestUsers();
 
-        assertEquals(secondUser, userStorage.findUser(testId), "Пользователь не совпадает с ожидаемым");
-
-        final IdNotFoundException e = assertThrows(
-                IdNotFoundException.class,
-                () -> userStorage.findUser(wrongTestId)
-        );
-
-        assertEquals("пользователь с заданным id не найден", e.getMessage(), "Сообщение об исключении не " +
-                "соответствует ожидаемому");
+        assertEquals(secondUser, userStorage.findUser(testId).get(), "Пользователь не совпадает с ожидаемым");
+        assertEquals(Optional.empty(), userStorage.findUser(wrongTestId), "Возвращаемый результат не" +
+                " пустой");
     }
 
     @Test
@@ -67,29 +63,29 @@ public class InMemoryUserStorageTest {
     }
 
     @Test
-    @DisplayName("Добавляет в хранилище нового пользователя и возвращает его с назначенным id. Если поле name пустое, " +
-            "то назначает ему значение login. Если поле friends = null, то назначает ему пустой HashSet")
+    @DisplayName("Добавляет в хранилище нового пользователя. Если поле name пустое, то назначает ему значение login." +
+            " Если поле friends = null, то назначает ему пустой HashSet. Возвращает нового пользователя")
     void shouldCreateNewUser() throws Exception {
         final User thirdUser = new User(0, "User1Mail@google.com", "User3", "",
                 LocalDate.parse("1991-05-23"), null);
-        final long expectedId = 3;
+        final long testId = 3;
         final User expectedUser = new User(3, "User1Mail@google.com", "User3", "User3",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
         createTestUsers();
 
-        final User reternedUser = userStorage.createNewUser(thirdUser);
+        final User returnedUser = userStorage.createNewUser(thirdUser);
+        final User newUser = userStorage.findUser(testId).get();
 
-        assertEquals(expectedId, reternedUser.getId(), "Назначенный пользователю id не соответствует ожидаемому");
-        assertEquals(reternedUser.getLogin(), reternedUser.getName(), "Назначенное пользователю name не " +
+        assertEquals(newUser.getLogin(), newUser.getName(), "Назначенное пользователю name не " +
                 "соответствует ожидаемому");
-        assertNotNull(reternedUser.getFriends(), "Поле friends не должно быть null");
-        assertEquals(expectedUser, userStorage.findUser(expectedId), "Пользователь не добавлен в хранилище");
-        assertEquals(expectedUser, reternedUser, "Возвращенный пользователь не соответствует ожидаемому");
+        assertNotNull(newUser.getFriends(), "Поле friends не должно быть null");
+        assertEquals(expectedUser, newUser, "Пользователь не добавлен в хранилище");
+        assertEquals(expectedUser, returnedUser, "Возвращенный пользователь не соответствует ожидаемому");
     }
 
     @Test
-    @DisplayName("Обновляет пользователя в хранилище и возвращает обновленного пользователя, выбрасывает исключение " +
-            "если пользователь с заданным id отсутствует")
+    @DisplayName("Обновляет пользователя в хранилище, выбрасывает исключение если пользователь с заданным id" +
+            " отсутствует. Возвращает обновленного пользователя")
     void shouldUpdateUser() throws Exception {
         final long testId = 2;
         final long wrongTestId = 999;
@@ -99,10 +95,10 @@ public class InMemoryUserStorageTest {
                 "Petr Petrov", LocalDate.parse("1988-06-01"), new HashSet<>());
         createTestUsers();
 
-        final User reternedUser = userStorage.updateUser(changedTestUser);
+        final User returnedUser = userStorage.updateUser(changedTestUser);
 
-        assertEquals(changedTestUser, userStorage.findUser(testId), "Пользователь не обновился в хранилище");
-        assertEquals(changedTestUser, reternedUser, "Возвращенный пользователь не соответствует ожидаемому");
+        assertEquals(changedTestUser, userStorage.findUser(testId).get(), "Пользователь не обновился в хранилище");
+        assertEquals(changedTestUser, returnedUser, "Возвращенный пользователь не соответствует ожидаемому");
 
         final IdNotFoundException e = assertThrows(
                 IdNotFoundException.class,

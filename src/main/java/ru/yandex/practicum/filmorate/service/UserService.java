@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectFriendIdException;
-import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -21,63 +21,67 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public User addFriend(long userId, long friendId) {
-        log.debug("Вызван метод 'addFriend' с параметрами userId={}, friendId={}", userId, friendId);
+    public void addFriend(long userId, long friendId) {
+        log.debug("+ addFriend: {}, {}", userId, friendId);
+
+        User targetUser = userStorage.findUser(userId).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
+        User targetFriend = userStorage.findUser(friendId).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
 
         validateFriendId(userId, friendId);
-        User user = validateUserOnNotNull(userStorage.findUser(userId));
-        User friend = validateUserOnNotNull(userStorage.findUser(friendId));
 
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-
-        log.debug("Метод 'addFriend' вернул: {}", user);
-        return user;
+        targetUser.getFriends().add(friendId);
+        targetFriend.getFriends().add(userId);
     }
 
-    public User deleteFriend(long userId, long friendId) {
-        log.debug("Вызван метод 'deleteFriend' с параметрами userId={}, friendId={}", userId, friendId);
+    public void deleteFriend(long userId, long friendId) {
+        log.debug("+ deleteFriend: {}, {}", userId, friendId);
+
+        User targetUser = userStorage.findUser(userId).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
+        User targetFriend = userStorage.findUser(friendId).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
 
         validateFriendId(userId, friendId);
-        User user = validateUserOnNotNull(userStorage.findUser(userId));
-        User friend = validateUserOnNotNull(userStorage.findUser(friendId));
 
-        boolean isFound = user.getFriends().remove(friendId);
+        boolean isFound = targetUser.getFriends().remove(friendId);
         if (!isFound) {
             throw new FriendNotFoundException("пользователь с заданным id не найден в списке друзей пользователя " +
                     userId, userId, friendId);
         }
-        friend.getFriends().remove(userId);
 
-        log.debug("Метод 'deleteFriend' вернул: {}", user);
-        return user;
+        targetFriend.getFriends().remove(userId);
     }
 
     public void deleteAllFriends(long userId) {
-        log.debug("Вызван метод 'deleteAllFriends' с параметром userId={}", userId);
+        log.debug("+ deleteAllFriends: {}", userId);
 
-        User user = validateUserOnNotNull(userStorage.findUser(userId));
-        List<User> friends = userStorage.findUsers(new ArrayList<>(user.getFriends()));
+        User targetUser = userStorage.findUser(userId).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
+        List<User> friends = userStorage.findUsers(new ArrayList<>(targetUser.getFriends()));
 
         for (User friend : friends) {
             friend.getFriends().remove(userId);
         }
 
-        user.getFriends().clear();
-        log.debug("Метод 'deleteAllFriends' вернул: {}", user);
+        targetUser.getFriends().clear();
     }
 
     public List<User> findFriends(long userId) {
-        User user = validateUserOnNotNull(userStorage.findUser(userId));
+        User targetUser = userStorage.findUser(userId).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
 
-        return userStorage.findUsers(new ArrayList<>(user.getFriends()));
+        return userStorage.findUsers(new ArrayList<>(targetUser.getFriends()));
     }
 
     public List<User> findCommonFriends(long userId, long otherUserId) {
         validateFriendId(userId, otherUserId);
 
-        User user = validateUserOnNotNull(userStorage.findUser(userId));
-        User otherUser = validateUserOnNotNull(userStorage.findUser(otherUserId));
+        User user = userStorage.findUser(userId).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
+        User otherUser = userStorage.findUser(otherUserId).orElseThrow(() -> new IdNotFoundException("пользователь с" +
+                " заданным id не найден", "пользователь"));
 
         List<Long> commonFriends = user.getFriends().stream()
                 .filter(id -> otherUser.getFriends().contains(id))
@@ -90,13 +94,5 @@ public class UserService {
         if (userId == friendId) {
             throw new IncorrectFriendIdException("id пользователей совпадают");
         }
-    }
-
-    private User validateUserOnNotNull(User user) {
-        if (user == null) {
-            throw new NullObjectException("Полученый из хранилища User оказался null");
-        }
-
-        return user;
     }
 }

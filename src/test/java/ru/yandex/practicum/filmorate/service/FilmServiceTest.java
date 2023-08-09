@@ -7,21 +7,24 @@ import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.impl.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FilmServiceTest {
     private final FilmStorage filmStorage = new InMemoryFilmStorage();
-    private final UserStorage userStorage = Mockito.mock(UserStorage.class);
+    private final UserStorage userStorage = mock(UserStorage.class);
     private final FilmService filmService = new FilmService(filmStorage, userStorage);
 
     final Film film1 = new Film(1, "TestFilm1", "Description",
@@ -59,45 +62,43 @@ public class FilmServiceTest {
     }
 
     @Test
-    @DisplayName("Добавляет лайк пользователя в список лайков фильма, возвращает фильм")
+    @DisplayName("Добавляет лайк пользователя в список лайков фильма")
     void shouldAddLikeToFilmById() throws Exception {
         final Film expectedFilm = new Film(8, "TestFilm8", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 4L, 6L)));
         final long userId = 6;
         createTestFilms();
 
-        Mockito.when(userStorage.findUser(userId)).thenReturn(new User(6, "User1Mail@google.com",
+        when(userStorage.findUser(userId)).thenReturn(Optional.of(new User(6, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
-                new HashSet<>(List.of(4L))));
-        final Film result = filmService.addLike(expectedFilm.getId(), userId);
+                new HashSet<>(List.of(4L)))));
+        filmService.addLike(expectedFilm.getId(), userId);
 
-        assertTrue(filmStorage.findFilm(expectedFilm.getId()).getLikes().contains(userId),
+        assertTrue(filmStorage.findFilm(expectedFilm.getId()).get().getLikes().contains(userId),
                 "Лайк пользователя не добавлен в список лайков фильма");
-        assertEquals(expectedFilm, result, "Возвращенный фильм не соответствует ожидаемому");
     }
 
     @Test
     @DisplayName("Удаляет лайк пользователя из списка лайков фильма, выбрасывает исключение при отсутствии лайка" +
-            "пользователя в списке лайков фильма, возвращает фильм")
+            "пользователя в списке лайков фильма")
     void shouldDeleteLikeOfFilmById() throws Exception {
         final Film expectedFilm = new Film(6, "TestFilm6", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L, 4L)));
         final long userId = 5;
         createTestFilms();
 
-        Mockito.when(userStorage.findUser(userId)).thenReturn(new User(5, "User1Mail@google.com",
+        when(userStorage.findUser(userId)).thenReturn(Optional.of(new User(5, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
-                new HashSet<>(List.of(4L))));
-        final Film result = filmService.deleteLike(expectedFilm.getId(), userId);
+                new HashSet<>(List.of(4L)))));
+        filmService.deleteLike(expectedFilm.getId(), userId);
 
-        assertFalse(filmStorage.findFilm(expectedFilm.getId()).getLikes().contains(userId),
+        assertFalse(filmStorage.findFilm(expectedFilm.getId()).get().getLikes().contains(userId),
                 "Лайк пользователя не удален из списка лайков фильма");
-        assertEquals(expectedFilm, result, "Возвращенный фильм не соответствует ожидаемому");
 
         final long wrongUserId = 8;
-        Mockito.when(userStorage.findUser(wrongUserId)).thenReturn(new User(8, "User1Mail@google.com",
+        when(userStorage.findUser(wrongUserId)).thenReturn(Optional.of(new User(8, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
-                new HashSet<>(List.of(4L))));
+                new HashSet<>(List.of(4L)))));
 
         final LikeNotFoundException e = assertThrows(
                 LikeNotFoundException.class,

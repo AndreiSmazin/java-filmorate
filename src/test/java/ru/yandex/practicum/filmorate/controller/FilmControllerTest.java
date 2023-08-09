@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,6 +23,9 @@ import ru.yandex.practicum.filmorate.valid.Violation;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.Mockito.when;
 
 @WebMvcTest(FilmController.class)
 public class FilmControllerTest {
@@ -52,7 +54,7 @@ public class FilmControllerTest {
 
         final List<Film> films = List.of(firstFilm, secondFilm);
 
-        Mockito.when(filmStorage.findAllFilms()).thenReturn(films);
+        when(filmStorage.findAllFilms()).thenReturn(films);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films"))
                 .andDo(MockMvcResultHandlers.print())
@@ -68,7 +70,7 @@ public class FilmControllerTest {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
 
-        Mockito.when(filmStorage.findFilm(testFilm.getId())).thenReturn(testFilm);
+        when(filmStorage.findFilm(testFilm.getId())).thenReturn(Optional.of(testFilm));
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films/" + testFilm.getId()))
                 .andDo(MockMvcResultHandlers.print())
@@ -78,12 +80,12 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("POST /films возвращает HTTP-ответ со статусом 200, типом данных application/json и фильмом в теле")
+    @DisplayName("POST /films возвращает HTTP-ответ со статусом 200 и фильмом в теле")
     void shouldCreateNewFilm() throws Exception {
         final Film testFilm = new Film(0, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
 
-        Mockito.when(filmStorage.createNewFilm(testFilm)).thenReturn(testFilm);
+        when(filmStorage.createNewFilm(testFilm)).thenReturn(testFilm);
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,12 +119,12 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /films возвращает HTTP-ответ со статусом 200, типом данных application/json и фильмом в теле")
+    @DisplayName("PUT /films возвращает HTTP-ответ со статусом 200 и фильмом в теле")
     void shouldUpdateFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
 
-        Mockito.when(filmStorage.updateFilm(testFilm)).thenReturn(testFilm);
+        when(filmStorage.updateFilm(testFilm)).thenReturn(testFilm);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -174,42 +176,31 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200, типом данных application/json и " +
-            "фильмом в теле")
+    @DisplayName("PUT /{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200")
     void shouldAddLikeToFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(10L)));
         final long userId = 10;
 
-        Mockito.when(filmService.addLike(testFilm.getId(), userId)).thenReturn(testFilm);
-
         this.mockMvc.perform(MockMvcRequestBuilders.put("/films/" + testFilm.getId() + "/like/" + userId))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testFilm)));
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @DisplayName("DELETE /{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200, типом данных application/json и " +
-            "фильмом в теле")
+    @DisplayName("DELETE /{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200")
     void shouldDeleteLikeOfFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
         final long userId = 10;
 
-        Mockito.when(filmService.deleteLike(testFilm.getId(), userId)).thenReturn(testFilm);
-
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + testFilm.getId() + "/like/" + userId))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testFilm)));
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @DisplayName("GET /films/popular?count={count} возвращает HTTP-ответ со статусом 200, типом данных " +
-            "application/json и списком фильмов в теле")
+    @DisplayName("GET /films/popular?count={count} возвращает HTTP-ответ со статусом 200")
     void shouldReturnPopularFilms() throws Exception {
         final Film firstFilm = new Film(1, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
@@ -219,7 +210,7 @@ public class FilmControllerTest {
 
         final List<Film> films = List.of(firstFilm, secondFilm);
 
-        Mockito.when(filmService.getPopularFilms(count)).thenReturn(films);
+        when(filmService.getPopularFilms(count)).thenReturn(films);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films/popular?count=" + count))
                 .andDo(MockMvcResultHandlers.print())

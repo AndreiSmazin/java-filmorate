@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,6 +23,9 @@ import ru.yandex.practicum.filmorate.valid.Violation;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.Mockito.when;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
@@ -52,7 +54,7 @@ public class UserControllerTest {
 
         final List<User> users = List.of(firstUser, secondUser);
 
-        Mockito.when(userStorage.findAllUsers()).thenReturn(users);
+        when(userStorage.findAllUsers()).thenReturn(users);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andDo(MockMvcResultHandlers.print())
@@ -68,7 +70,7 @@ public class UserControllerTest {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        Mockito.when(userStorage.findUser(1)).thenReturn(testUser);
+        when(userStorage.findUser(1)).thenReturn(Optional.of(testUser));
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testUser.getId()))
                 .andDo(MockMvcResultHandlers.print())
@@ -78,13 +80,12 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /users возвращает HTTP-ответ со статусом 200, типом данных application/json и пользователем " +
-            "в теле")
+    @DisplayName("POST /users возвращает HTTP-ответ со статусом 200 и пользователем в теле")
     void shouldCreateNewUser() throws Exception {
         final User testUser = new User(0, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        Mockito.when(userStorage.createNewUser(testUser)).thenReturn(testUser);
+        when(userStorage.createNewUser(testUser)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,13 +116,12 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /users возвращает HTTP-ответ со статусом 200, типом данных application/json и пользователем " +
-            "в теле")
+    @DisplayName("PUT /users возвращает HTTP-ответ со статусом 200 и пользователем в теле")
     void shouldUpdateUser() throws Exception {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        Mockito.when(userStorage.updateUser(testUser)).thenReturn(testUser);
+        when(userStorage.updateUser(testUser)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -170,39 +170,29 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /users/{userId}/friends/{friendId} возвращает HTTP-ответ со статусом 200, типом данных " +
-            "application/json и пользователем в теле")
+    @DisplayName("PUT /users/{userId}/friends/{friendId} возвращает HTTP-ответ со статусом 200")
     void shouldAddNewFriend() throws Exception {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2L, 4L)));
         final long testFriendId = 4;
 
-        Mockito.when(userService.addFriend(testUser.getId(), testFriendId)).thenReturn(testUser);
-
         this.mockMvc.perform(MockMvcRequestBuilders.put("/users/" + testUser.getId() + "/friends/" +
                         testFriendId))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testUser)));
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @DisplayName("DELETE /users/{userId}/friends/{friendId} возвращает HTTP-ответ со статусом 200, типом данных " +
-            "application/json и пользователем в теле")
+    @DisplayName("DELETE /users/{userId}/friends/{friendId} возвращает HTTP-ответ со статусом 200")
     void shouldDeleteFriend() throws Exception {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>(List.of(2L)));
         final long testFriendId = 4;
 
-        Mockito.when(userService.deleteFriend(testUser.getId(), testFriendId)).thenReturn(testUser);
-
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/users/" + testUser.getId() + "/friends/" +
                         testFriendId))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testUser)));
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
@@ -217,7 +207,7 @@ public class UserControllerTest {
 
         final List<User> friends = List.of(firstUser, secondUser);
 
-        Mockito.when(userService.findFriends(testId)).thenReturn(friends);
+        when(userService.findFriends(testId)).thenReturn(friends);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testId + "/friends"))
                 .andDo(MockMvcResultHandlers.print())
@@ -239,7 +229,7 @@ public class UserControllerTest {
 
         final List<User> friends = List.of(firstUser, secondUser);
 
-        Mockito.when(userService.findCommonFriends(firstTestId, secondTestId)).thenReturn(friends);
+        when(userService.findCommonFriends(firstTestId, secondTestId)).thenReturn(friends);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + firstTestId + "/friends/common/" +
                         secondTestId))
