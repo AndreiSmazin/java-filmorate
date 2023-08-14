@@ -23,7 +23,6 @@ import ru.yandex.practicum.filmorate.valid.Violation;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 
@@ -33,9 +32,9 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private UserStorage userStorage;
-    @MockBean
     private UserService userService;
+    @MockBean
+    private UserStorage userStorage;
 
     @BeforeAll
     static void createMapper() {
@@ -54,7 +53,7 @@ public class UserControllerTest {
 
         final List<User> users = List.of(firstUser, secondUser);
 
-        when(userStorage.findAllUsers()).thenReturn(users);
+        when(userService.findAllUsers()).thenReturn(users);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andDo(MockMvcResultHandlers.print())
@@ -70,7 +69,7 @@ public class UserControllerTest {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        when(userStorage.findUser(1)).thenReturn(Optional.of(testUser));
+        when(userService.findUser(1)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testUser.getId()))
                 .andDo(MockMvcResultHandlers.print())
@@ -85,7 +84,7 @@ public class UserControllerTest {
         final User testUser = new User(0, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        when(userStorage.createNewUser(testUser)).thenReturn(testUser);
+        when(userService.createUser(testUser)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -121,7 +120,7 @@ public class UserControllerTest {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        when(userStorage.updateUser(testUser)).thenReturn(testUser);
+        when(userService.updateUser(testUser)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -217,8 +216,8 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("GET /users/{userId}/friends/common/{otherUserId} возвращает HTTP-ответ со статусом 200, типом данных " +
-            "application/json и списком общих друзей пользователя в теле")
+    @DisplayName("GET /users/{userId}/friends/common/{otherUserId} возвращает HTTP-ответ со статусом 200, типом" +
+            " данных application/json и списком общих друзей пользователя в теле")
     void shouldReturnCommonFriends() throws Exception {
         final long firstTestId = 3;
         final long secondTestId = 4;

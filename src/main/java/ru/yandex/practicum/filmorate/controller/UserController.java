@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -33,38 +32,36 @@ public class UserController {
 
     @GetMapping
     public List<User> findAll() {
-        return userStorage.findAllUsers();
+        return userService.findAllUsers();
     }
 
     @GetMapping("/{id}")
     public User find(@PathVariable long id) {
-        return userStorage.findUser(id).orElseThrow(() -> new IdNotFoundException("пользователь с" +
-                " заданным id не найден", "пользователь"));
+        return userService.findUser(id);
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         log.info("Received POST-request /users with body: {}", user);
-        return userStorage.createNewUser(user);
+        return userService.createUser(user);
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
         log.info("Received PUT-request /users with body: {}", user);
-        return userStorage.updateUser(user);
+        return userService.updateUser(user);
     }
 
     @DeleteMapping
     public void deleteAll() {
         log.info("Received DELETE-request /users");
-        userStorage.deleteAllUsers();
+        userService.deleteAllUsers();
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable long id) {
         log.info("Received DELETE-request /users/{}", id);
-        userService.deleteAllFriends(id);
-        userStorage.deleteUser(id);
+        userService.deleteUser(id);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")

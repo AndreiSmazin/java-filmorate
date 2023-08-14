@@ -23,7 +23,6 @@ import ru.yandex.practicum.filmorate.valid.Violation;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 
@@ -33,9 +32,9 @@ public class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private FilmStorage filmStorage;
-    @MockBean
     private FilmService filmService;
+    @MockBean
+    private FilmStorage filmStorage;
 
     @BeforeAll
     static void createMapper() {
@@ -54,7 +53,7 @@ public class FilmControllerTest {
 
         final List<Film> films = List.of(firstFilm, secondFilm);
 
-        when(filmStorage.findAllFilms()).thenReturn(films);
+        when(filmService.findAllFilms()).thenReturn(films);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films"))
                 .andDo(MockMvcResultHandlers.print())
@@ -70,7 +69,7 @@ public class FilmControllerTest {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
 
-        when(filmStorage.findFilm(testFilm.getId())).thenReturn(Optional.of(testFilm));
+        when(filmService.findFilm(testFilm.getId())).thenReturn(testFilm);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films/" + testFilm.getId()))
                 .andDo(MockMvcResultHandlers.print())
@@ -85,7 +84,7 @@ public class FilmControllerTest {
         final Film testFilm = new Film(0, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
 
-        when(filmStorage.createNewFilm(testFilm)).thenReturn(testFilm);
+        when(filmService.createFilm(testFilm)).thenReturn(testFilm);
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +123,7 @@ public class FilmControllerTest {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>());
 
-        when(filmStorage.updateFilm(testFilm)).thenReturn(testFilm);
+        when(filmService.updateFilm(testFilm)).thenReturn(testFilm);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -220,8 +219,8 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /{filmId}/like/{userId} при получении некорректных id возвращает HTTP-ответ со статусом 400 и " +
-            "сообщениями об ошибках валидации в теле")
+    @DisplayName("DELETE /{filmId}/like/{userId} при получении некорректных id возвращает HTTP-ответ со статусом 400" +
+            " и сообщениями об ошибках валидации в теле")
     void shouldNotReturnPopularFilmsWhenCountIncorrect() throws Exception {
         final int count = 0;
         final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(

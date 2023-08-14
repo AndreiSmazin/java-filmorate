@@ -2,13 +2,11 @@ package ru.yandex.practicum.filmorate.storage.film.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,49 +15,29 @@ import java.util.Optional;
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
-    private long currentId = 1;
-
 
     @Override
-    public List<Film> findAllFilms() {
+    public List<Film> getAllFilms() {
         return new ArrayList<>(films.values());
     }
 
     @Override
-    public Optional<Film> findFilm(long id) {
+    public Optional<Film> getFilm(long id) {
         return Optional.ofNullable(films.get(id));
     }
 
     @Override
-    public Film createNewFilm(Film film) {
-        log.debug("+ createNewFilm: {}", film);
+    public void addFilm(Film film) {
+        log.debug("+ addFilm: {}", film);
 
-        film.setId(currentId);
-        currentId += 1;
-
-        validateLikes(film);
         films.put(film.getId(), film);
-
-        return film;
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public void updateFilm(Film film) {
         log.debug("+ updateFilm: {}", film);
 
-        Film targetFilm = films.get(film.getId());
-        if (targetFilm == null) {
-            throw new IdNotFoundException("фильм с заданным id не найден", "фильм");
-        }
-
-        validateLikes(film);
-
-        targetFilm.setName(film.getName());
-        targetFilm.setDescription(film.getDescription());
-        targetFilm.setReleaseDate(film.getReleaseDate());
-        targetFilm.setDuration(film.getDuration());
-
-        return targetFilm;
+        films.put(film.getId(), film);
     }
 
     @Override
@@ -70,18 +48,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(long id) {
+    public Film deleteFilm(long id) {
         log.debug("+ deleteFilm: {}", id);
 
-        Film targetFilm = films.remove(id);
-        if (targetFilm == null) {
-            throw new IdNotFoundException("фильм с заданным id не найден", "фильм");
-        }
-    }
-
-    private void validateLikes(Film film) {
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }
+        return films.remove(id);
     }
 }

@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FilmStorage {
-    public List<Film> findAllFilms();
+    List<Film> getAllFilms();
 
-    public Optional<Film> findFilm(long id);
+    Optional<Film> getFilm(long id);
 
-    public Film createNewFilm(Film film);
+    void addFilm(Film film);
 
-    public Film updateFilm(Film film);
+    void updateFilm(Film film);
 
-    public void deleteAllFilms();
+    void deleteAllFilms();
 
-    public void deleteFilm(long id);
+    Film deleteFilm(long id);
 }

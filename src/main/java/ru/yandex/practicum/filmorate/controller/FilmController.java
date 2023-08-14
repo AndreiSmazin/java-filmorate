@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -37,37 +36,36 @@ public class FilmController {
 
     @GetMapping
     public List<Film> findAll() {
-        return filmStorage.findAllFilms();
+        return filmService.findAllFilms();
     }
 
     @GetMapping("/{id}")
     public Film find(@PathVariable long id) {
-        return filmStorage.findFilm(id).orElseThrow(() -> new IdNotFoundException("фильм с заданным id не найден",
-                "фильм"));
+        return filmService.findFilm(id);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         log.info("Received POST-request /films with body: {}", film);
-        return filmStorage.createNewFilm(film);
+        return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         log.info("Received PUT-request /films with body: {}", film);
-        return filmStorage.updateFilm(film);
+        return filmService.updateFilm(film);
     }
 
     @DeleteMapping
     public void deleteAll() {
         log.info("Received DELETE-request /films");
-        filmStorage.deleteAllFilms();
+        filmService.deleteAllFilms();
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable long id) {
         log.info("Received DELETE-request /films/{}", id);
-        filmStorage.deleteFilm(id);
+        filmService.deleteFilm(id);
     }
 
     @PutMapping("/{filmId}/like/{userId}")

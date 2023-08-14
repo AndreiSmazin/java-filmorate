@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -15,9 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,32 +50,111 @@ public class FilmServiceTest {
             LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L, 4L)));
 
     private void createTestFilms() {
-        filmStorage.createNewFilm(film1);
-        filmStorage.createNewFilm(film2);
-        filmStorage.createNewFilm(film3);
-        filmStorage.createNewFilm(film4);
-        filmStorage.createNewFilm(film5);
-        filmStorage.createNewFilm(film6);
-        filmStorage.createNewFilm(film7);
-        filmStorage.createNewFilm(film8);
-        filmStorage.createNewFilm(film9);
-        filmStorage.createNewFilm(film10);
+        filmService.createFilm(film1);
+        filmService.createFilm(film2);
+        filmService.createFilm(film3);
+        filmService.createFilm(film4);
+        filmService.createFilm(film5);
+        filmService.createFilm(film6);
+        filmService.createFilm(film7);
+        filmService.createFilm(film8);
+        filmService.createFilm(film9);
+        filmService.createFilm(film10);
+    }
+
+    @Test
+    @DisplayName("Возвращает фильм по заданному id, выбрасывает исключение фильм с заданным id отсутствует")
+    void shouldReturnFilmById() throws Exception {
+        final long testId = 2;
+        final long wrongTestId = 999;
+        createTestFilms();
+
+        when(filmStorage.getFilm(testId)).thenReturn(Optional.of(film2));
+
+        assertEquals(film2, filmService.findFilm(testId), "Фильм не совпадает с ожидаемым");
+
+        final IdNotFoundException e = assertThrows(
+                IdNotFoundException.class,
+                () -> filmService.findFilm(wrongTestId));
+
+        assertEquals("фильм с заданным id не найден", e.getMessage(), "Сообщение об исключении не " +
+                "соответствует ожидаемому");
+    }
+
+    @Test
+    @DisplayName("Назначает id и добавляет в хранилище новый фильм. Если поле likes = null, то назначает ему пустой" +
+            " HashSet. Возвращает добавленный фильм.")
+    void shouldCreateNewFilm() throws Exception {
+        final Film testFilm = new Film(0, "TestFilm11", "Description",
+                LocalDate.parse("2019-04-12"), 186, null);
+        final long expectedId = 11;
+        final Film expectedFilm = new Film(expectedId, "TestFilm11", "Description",
+                LocalDate.parse("2019-04-12"), 186, new HashSet<>());
+        createTestFilms();
+
+        final Film returnedFilm = filmService.createFilm(testFilm);
+
+        assertEquals(expectedId, returnedFilm.getId(), "id не соответствует ожидаемому");
+        assertNotNull(returnedFilm.getLikes(), "Поле likes не должно быть null");
+        assertEquals(expectedFilm, returnedFilm, "Возвращаемый фильм не соответствует ожидаемому");
+    }
+
+    @Test
+    @DisplayName("Обновляет фильм в хранилище, выбрасывает исключение если фильм с заданным id отсутствует." +
+            " Возвращает измененный фильм")
+    void shouldUpdateFilm() throws Exception {
+        final long testId = 2;
+        final long wrongTestId = 999;
+        final Film expectedFilm = new Film(testId, "TestFilm2", "New description",
+                LocalDate.parse("2020-06-01"), 195, new HashSet<>(List.of(1L, 2L, 5L)));
+        final Film incorrectChangedTestFilm = new Film(wrongTestId, "TestFilm2", "New description",
+                LocalDate.parse("2020-06-01"), 195, new HashSet<>());
+        createTestFilms();
+
+        final Film returnedFilm = filmService.updateFilm(expectedFilm);
+
+        assertNotNull(returnedFilm.getLikes(), "Поле likes не должно быть null");
+        assertEquals(expectedFilm, returnedFilm, "Возвращаемый фильм не соответствует ожидаемому");
+
+        final IdNotFoundException e = assertThrows(
+                IdNotFoundException.class,
+                () -> filmService.updateFilm(incorrectChangedTestFilm)
+        );
+
+        assertEquals("фильм с заданным id не найден", e.getMessage(), "Сообщение об исключении не " +
+                "соответствует ожидаемому");
+    }
+
+    @Test
+    @DisplayName("Удаляет фильм из хранилища по заданному id, выбрасывает исключение если фильм с заданным id " +
+            "отсутствует")
+    void shouldDeleteFilmById() throws Exception {
+        final long wrongTestId = 999;
+        createTestFilms();
+
+        final IdNotFoundException e = assertThrows(
+                IdNotFoundException.class,
+                () -> filmService.deleteFilm(wrongTestId)
+        );
+
+        assertEquals("фильм с заданным id не найден", e.getMessage(), "Сообщение об исключении не " +
+                "соответствует ожидаемому");
     }
 
     @Test
     @DisplayName("Добавляет лайк пользователя в список лайков фильма")
     void shouldAddLikeToFilmById() throws Exception {
-        final Film expectedFilm = new Film(8, "TestFilm8", "Description",
+        final Film testFilm = new Film(8, "TestFilm8", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 4L, 6L)));
         final long userId = 6;
         createTestFilms();
 
-        when(userStorage.findUser(userId)).thenReturn(Optional.of(new User(6, "User1Mail@google.com",
+        when(userStorage.getUser(userId)).thenReturn(Optional.of(new User(6, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
                 new HashSet<>(List.of(4L)))));
-        filmService.addLike(expectedFilm.getId(), userId);
+        filmService.addLike(testFilm.getId(), userId);
 
-        assertTrue(filmStorage.findFilm(expectedFilm.getId()).get().getLikes().contains(userId),
+        assertTrue(filmStorage.getFilm(testFilm.getId()).get().getLikes().contains(userId),
                 "Лайк пользователя не добавлен в список лайков фильма");
     }
 
@@ -81,31 +162,31 @@ public class FilmServiceTest {
     @DisplayName("Удаляет лайк пользователя из списка лайков фильма, выбрасывает исключение при отсутствии лайка" +
             "пользователя в списке лайков фильма")
     void shouldDeleteLikeOfFilmById() throws Exception {
-        final Film expectedFilm = new Film(6, "TestFilm6", "Description",
+        final Film testFilm = new Film(6, "TestFilm6", "Description",
                 LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L, 4L)));
         final long userId = 5;
         createTestFilms();
 
-        when(userStorage.findUser(userId)).thenReturn(Optional.of(new User(5, "User1Mail@google.com",
+        when(userStorage.getUser(userId)).thenReturn(Optional.of(new User(5, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
                 new HashSet<>(List.of(4L)))));
-        filmService.deleteLike(expectedFilm.getId(), userId);
+        filmService.deleteLike(testFilm.getId(), userId);
 
-        assertFalse(filmStorage.findFilm(expectedFilm.getId()).get().getLikes().contains(userId),
+        assertFalse(filmStorage.getFilm(testFilm.getId()).get().getLikes().contains(userId),
                 "Лайк пользователя не удален из списка лайков фильма");
 
         final long wrongUserId = 8;
-        when(userStorage.findUser(wrongUserId)).thenReturn(Optional.of(new User(8, "User1Mail@google.com",
+        when(userStorage.getUser(wrongUserId)).thenReturn(Optional.of(new User(8, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
                 new HashSet<>(List.of(4L)))));
 
         final LikeNotFoundException e = assertThrows(
                 LikeNotFoundException.class,
-                () -> filmService.deleteLike(expectedFilm.getId(), wrongUserId)
+                () -> filmService.deleteLike(testFilm.getId(), wrongUserId)
         );
 
         assertEquals("Лайк пользователя с заданным id не найден в списке лайков фильма " +
-                expectedFilm.getId(), e.getMessage());
+                testFilm.getId(), e.getMessage());
     }
 
     @Test
