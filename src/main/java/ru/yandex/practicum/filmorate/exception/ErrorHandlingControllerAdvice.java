@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
 import ru.yandex.practicum.filmorate.valid.Violation;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,10 +36,55 @@ public class ErrorHandlingControllerAdvice {
         return new ValidationErrorResponse(violations);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ValidationErrorResponse onConstraintViolationException(ConstraintViolationException e) {
+        for (ConstraintViolation constraintViolation : e.getConstraintViolations()) {
+            log.error("Ошибка валидации запроса: некорректное значение '{}' переменной '{}'; '{}' {}",
+                    constraintViolation.getInvalidValue(), getFieldName(constraintViolation),
+                    getFieldName(constraintViolation), constraintViolation.getMessage());
+        }
+
+        final List<Violation> violations = e.getConstraintViolations().stream()
+                .map(violation -> new Violation(getFieldName(violation), violation.getMessage()))
+                .collect(Collectors.toList());
+
+        return new ValidationErrorResponse(violations);
+    }
+
     @ExceptionHandler(IdNotFoundException.class)
-    public ResponseEntity<Violation> idNotFoundException(IdNotFoundException e) {
-        log.error("Некорректный запрос: {} с id={} не найден", e.getItemType(), e.getId());
+    public ResponseEntity<Violation> onIdNotFoundException(IdNotFoundException e) {
+        log.error("Некорректный запрос: {} не найден", e.getItemType());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("id", e.getMessage()));
+    }
+
+    @ExceptionHandler(FriendNotFoundException.class)
+    public ResponseEntity<Violation> onFriendNotFoundException(FriendNotFoundException e) {
+        log.error("Некорректный запрос: пользователь с id={} не найден в списке друзей пользователя с id={}",
+                e.getFriendId(), e.getUserId());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("friendId", e.getMessage()));
+    }
+
+    @ExceptionHandler(IncorrectFriendIdException.class)
+    public ResponseEntity<Violation> onIncorrectFriendIdException(IncorrectFriendIdException e) {
+        log.error("Некорректный запрос: id пользователя и id друга совпадают");
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("friendId", e.getMessage()));
+    }
+
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<Violation> onLikeNotFoundException(LikeNotFoundException e) {
+        log.error("Некорректный запрос: лайк пользователя с id={} не найден в списке лайков фильма с id={}",
+                e.getFilmId(), e.getUserID());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("userId", e.getMessage()));
+    }
+
+    private String getFieldName(ConstraintViolation constraintViolation) {
+        String[] propertyPath = constraintViolation.getPropertyPath().toString().split("\\.");
+        return propertyPath[propertyPath.length - 1];
     }
 }
