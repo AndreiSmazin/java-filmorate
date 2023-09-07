@@ -14,9 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.entity.Film;
+import ru.yandex.practicum.filmorate.entity.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
 import ru.yandex.practicum.filmorate.valid.Violation;
 
@@ -33,8 +33,6 @@ public class FilmControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private FilmService filmService;
-    @MockBean
-    private FilmStorage filmStorage;
 
     @BeforeAll
     static void createMapper() {
@@ -47,19 +45,19 @@ public class FilmControllerTest {
             "в теле")
     void shouldReturnAllFilms() throws Exception {
         final Film firstFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>());
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
         final Film secondFilm = new Film(2, "TestFilm2", "Description",
-                LocalDate.parse("2020-06-01"), 200, new HashSet<>());
+                LocalDate.parse("2020-06-01"), 200, new Mpa(1, "R"), new HashSet<>());
 
-        final List<Film> films = List.of(firstFilm, secondFilm);
+        final List<Film> filmWithGenres = List.of(firstFilm, secondFilm);
 
-        when(filmService.findAllFilms()).thenReturn(films);
+        when(filmService.findAllFilms()).thenReturn(filmWithGenres);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(films)));
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(filmWithGenres)));
     }
 
     @Test
@@ -207,15 +205,15 @@ public class FilmControllerTest {
                 LocalDate.parse("2020-06-01"), 200, new HashSet<>());
         final int count = 2;
 
-        final List<Film> films = List.of(firstFilm, secondFilm);
+        final List<Film> filmWithGenres = List.of(firstFilm, secondFilm);
 
-        when(filmService.getPopularFilms(count)).thenReturn(films);
+        when(filmService.getPopularFilms(count)).thenReturn(filmWithGenres);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films/popular?count=" + count))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(films)));
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(filmWithGenres)));
     }
 
     @Test

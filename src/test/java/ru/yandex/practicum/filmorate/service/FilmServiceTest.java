@@ -2,13 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.impl.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.dao.impl.FilmCrudDaoInMemoryImpl;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -24,9 +23,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class FilmServiceTest {
-    private final FilmStorage filmStorage = new InMemoryFilmStorage();
+    private final FilmDao filmDao = new FilmCrudDaoInMemoryImpl();
     private final UserStorage userStorage = mock(UserStorage.class);
-    private final FilmService filmService = new FilmService(filmStorage, userStorage);
+    private final FilmService filmService = new FilmService(filmDao, userStorage);
 
     final Film film1 = new Film(1, "TestFilm1", "Description",
             LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L)));
@@ -69,7 +68,7 @@ public class FilmServiceTest {
         final long wrongTestId = 999;
         createTestFilms();
 
-        when(filmStorage.getFilm(testId)).thenReturn(Optional.of(film2));
+        when(filmDao.getFilm(testId)).thenReturn(Optional.of(film2));
 
         assertEquals(film2, filmService.findFilm(testId), "Фильм не совпадает с ожидаемым");
 
@@ -154,7 +153,7 @@ public class FilmServiceTest {
                 new HashSet<>(List.of(4L)))));
         filmService.addLike(testFilm.getId(), userId);
 
-        assertTrue(filmStorage.getFilm(testFilm.getId()).get().getLikes().contains(userId),
+        assertTrue(filmDao.getFilm(testFilm.getId()).get().getLikes().contains(userId),
                 "Лайк пользователя не добавлен в список лайков фильма");
     }
 
@@ -172,7 +171,7 @@ public class FilmServiceTest {
                 new HashSet<>(List.of(4L)))));
         filmService.deleteLike(testFilm.getId(), userId);
 
-        assertFalse(filmStorage.getFilm(testFilm.getId()).get().getLikes().contains(userId),
+        assertFalse(filmDao.getFilm(testFilm.getId()).get().getLikes().contains(userId),
                 "Лайк пользователя не удален из списка лайков фильма");
 
         final long wrongUserId = 8;

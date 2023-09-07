@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.entity.Film;
+import ru.yandex.practicum.filmorate.entity.Genre;
+import ru.yandex.practicum.filmorate.entity.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -22,66 +23,77 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
     @Autowired
-    public FilmController(FilmStorage filmStorage, FilmService filmService) {
-        this.filmStorage = filmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
-    @GetMapping
+    @GetMapping("/films")
     public List<Film> findAll() {
         return filmService.findAllFilms();
     }
 
-    @GetMapping("/{id}")
-    public Film find(@PathVariable long id) {
+    @GetMapping("/films/{id}")
+    public Film find(@PathVariable int id) {
         return filmService.findFilm(id);
     }
 
-    @PostMapping
+    @PostMapping("/films")
     public Film create(@Valid @RequestBody Film film) {
         log.info("Received POST-request /films with body: {}", film);
         return filmService.createFilm(film);
     }
 
-    @PutMapping
+    @PutMapping("/films")
     public Film update(@Valid @RequestBody Film film) {
         log.info("Received PUT-request /films with body: {}", film);
         return filmService.updateFilm(film);
     }
 
-    @DeleteMapping
-    public void deleteAll() {
-        log.info("Received DELETE-request /films");
-        filmService.deleteAllFilms();
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable long id) {
+    @DeleteMapping("/films/{id}")
+    public void deleteById(@PathVariable int id) {
         log.info("Received DELETE-request /films/{}", id);
         filmService.deleteFilm(id);
     }
 
-    @PutMapping("/{filmId}/like/{userId}")
-    public void addLikeToFilmById(@PathVariable long filmId, @PathVariable long userId) {
+    @PutMapping("/films/{filmId}/like/{userId}")
+    public void addLikeToFilmById(@PathVariable int filmId, @PathVariable int userId) {
         log.info("Received PUT-request /films/{}/like/{}", filmId, userId);
         filmService.addLike(filmId, userId);
     }
 
-    @DeleteMapping("/{filmId}/like/{userId}")
-    public void deleteLikeOfFilmById(@PathVariable long filmId, @PathVariable long userId) {
+    @DeleteMapping("/films/{filmId}/like/{userId}")
+    public void deleteLikeOfFilmById(@PathVariable int filmId, @PathVariable int userId) {
         log.info("Received DELETE-request /films/{}/like/{}", filmId, userId);
         filmService.deleteLike(filmId, userId);
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/films/popular")
     public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") @Min(1) int count) {
         return filmService.getPopularFilms(count);
+    }
+
+    @GetMapping("/genres")
+    public List<Genre> findAllGenres() {
+        return filmService.getAllGenres();
+    }
+
+    @GetMapping("/genres/{id}")
+    public Genre findGenreById(@PathVariable int id) {
+        return filmService.getGenreById(id);
+    }
+
+    @GetMapping("/mpa")
+    public List<Mpa> findAllMpa() {
+        return filmService.getAllMpa();
+    }
+
+    @GetMapping("/mpa/{id}")
+    public Mpa findMpaById(@PathVariable int id) {
+        return filmService.getMpaById(id);
     }
 }

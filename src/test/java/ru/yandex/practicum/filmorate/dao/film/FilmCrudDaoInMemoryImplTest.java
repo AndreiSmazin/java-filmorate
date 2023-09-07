@@ -1,9 +1,9 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.dao.film;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.impl.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.entity.Film;
+import ru.yandex.practicum.filmorate.dao.impl.FilmCrudDaoInMemoryImpl;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class InMemoryFilmStorageTest {
-    private final InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
+public class FilmCrudDaoInMemoryImplTest {
+    private final FilmCrudDaoInMemoryImpl filmStorage = new FilmCrudDaoInMemoryImpl();
 
     final Film firstFilm = new Film(1, "TestFilm1", "Description",
             LocalDate.parse("1991-12-25"), 200, new HashSet<>());
@@ -29,10 +29,10 @@ public class InMemoryFilmStorageTest {
     @Test
     @DisplayName("Возвращает список всех фильмов")
     void shouldReturnAllFilms() throws Exception {
-        final List<Film> expectedFilms = List.of(firstFilm, secondFilm);
+        final List<Film> expectedFilmWithGenres = List.of(firstFilm, secondFilm);
         createTestFilms();
 
-        assertEquals(expectedFilms, filmStorage.getAllFilms(), "Список фильмов не совпадает с ожидаемым");
+        assertEquals(expectedFilmWithGenres, filmStorage.getAllFilms(), "Список фильмов не совпадает с ожидаемым");
     }
 
     @Test

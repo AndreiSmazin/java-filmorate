@@ -1,21 +1,20 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.valid.CorrectReleaseDate;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class Film {
-    private long id; // идентификатор
+    private int id; // идентификатор
 
     @NotBlank
     private String name; // название
@@ -33,5 +32,8 @@ public class Film {
     @Positive
     private int duration; // длительность фильма в минутах
 
-    private Set<Long> likes;
+    @NotNull
+    private Mpa mpa;
+
+    private Set<Genre> genres;
 }

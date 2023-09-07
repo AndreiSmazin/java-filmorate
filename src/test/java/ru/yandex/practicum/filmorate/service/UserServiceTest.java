@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectFriendIdException;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.impl.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.dao.user.impl.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;

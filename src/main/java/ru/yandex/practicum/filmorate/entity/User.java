@@ -1,7 +1,8 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.valid.CorrectLogin;
 
@@ -13,8 +14,9 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class User {
-    private long id; // идентификатор
+    private int id; // идентификатор
 
     @NotNull
     @Email
@@ -30,6 +32,4 @@ public class User {
     @NotNull
     @Past
     private LocalDate birthday; // дата рождения
-
-    private Set<Long> friends; // друзья пользователя
 }

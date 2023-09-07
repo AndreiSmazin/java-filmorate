@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.FriendDao;
+import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectFriendIdException;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 
 import java.util.HashSet;
 import java.util.List;
@@ -15,32 +18,33 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class UserService {
-    private final UserStorage userStorage;
-    private long currentId = 1;
+    private final UserDao userDao;
+    private final FriendDao friendDao;
 
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    @Autowired
+    public UserService(UserDao userDao, FriendDao friendDao) {
+        this.userDao = userDao;
+        this.friendDao = friendDao;
     }
 
     public List<User> findAllUsers() {
-        return userStorage.getAllUsers();
+        return userDao.findAll();
     }
 
-    public User findUser(long id) {
-        return userStorage.getUser(id).orElseThrow(() -> new IdNotFoundException("пользователь с заданным id не найден",
+    public User findUser(int id) {
+        return userDao.findById(id).orElseThrow(() -> new IdNotFoundException("пользователь с заданным id не найден",
                 "пользователь"));
     }
 
     public User createUser(User user) {
         log.debug("+ createUser: {}", user);
 
-        user.setId(currentId);
-        currentId += 1;
+        if (user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
 
-        validateName(user);
-        validateFriends(user);
+        user.setId(userDao.save(user));
 
-        userStorage.addUser(user);
         return user;
     }
 
@@ -49,111 +53,66 @@ public class UserService {
 
         User targetUser = findUser(user.getId());
 
-        validateName(user);
-        validateFriends(user);
-
         targetUser.setEmail(user.getEmail());
         targetUser.setLogin(user.getLogin());
         targetUser.setName(user.getName());
         targetUser.setBirthday(user.getBirthday());
 
-        userStorage.updateUser(targetUser);
+        userDao.update(user);
         return targetUser;
     }
 
-    public void deleteAllUsers() {
-        log.debug("+ deleteAllUsers");
-
-        userStorage.deleteAllUsers();
-    }
-
-    public void deleteUser(long id) {
+    public void deleteUser(int id) {
         log.debug("+ deleteUser: {}", id);
 
-        deleteAllFriends(id);
-        userStorage.deleteUser(id);
+        findUser(id);
+
+        userDao.deleteById(id);
     }
 
-    public void addFriend(long userId, long friendId) {
+    public void addFriend(int userId, int friendId) {
         log.debug("+ addFriend: {}, {}", userId, friendId);
 
-        User targetUser = findUser(userId);
-        User targetFriend = findUser(friendId);
-
+        findUser(userId);
+        findUser(friendId);
         validateFriendId(userId, friendId);
 
-        targetUser.getFriends().add(friendId);
-        targetFriend.getFriends().add(userId);
+        friendDao.save(userId, friendId);
 
-        userStorage.updateUser(targetUser);
-        userStorage.updateUser(targetFriend);
+        if (friendDao.findById(friendId, userId).isPresent()) {
+            friendDao.update(userId, friendId, true);
+            friendDao.update(friendId, userId, true);
+        }
     }
 
-    public void deleteFriend(long userId, long friendId) {
+    public void deleteFriend(int userId, int friendId) {
         log.debug("+ deleteFriend: {}, {}", userId, friendId);
 
-        User targetUser = findUser(userId);
-        User targetFriend = findUser(friendId);
-
+        findUser(userId);
+        findUser(friendId);
         validateFriendId(userId, friendId);
 
-        boolean isFound = targetUser.getFriends().remove(friendId);
-        if (!isFound) {
-            throw new FriendNotFoundException("пользователь с заданным id не найден в списке друзей пользователя " +
-                    userId, userId, friendId);
+        friendDao.deleteById(userId, friendId);
+
+        if(friendDao.findById(friendId, userId).isPresent()) {
+            friendDao.update(friendId, userId, false);
         }
-
-        targetFriend.getFriends().remove(userId);
-
-        userStorage.updateUser(targetUser);
-        userStorage.updateUser(targetFriend);
     }
 
-    public List<User> findFriends(long userId) {
-        User targetUser = findUser(userId);
+    public List<User> findFriends(int userId) {
 
-        return targetUser.getFriends().stream()
-                .map(this::findUser)
-                .collect(Collectors.toList());
+        return userDao.findFriendsById(userId);
     }
 
-    public List<User> findCommonFriends(long userId, long otherUserId) {
+    public List<User> findCommonFriends(int userId, int otherUserId) {
         validateFriendId(userId, otherUserId);
 
-        return findFriends(userId).stream()
-                .filter(friend -> findFriends(otherUserId).contains(friend))
-                .collect(Collectors.toList());
+        return userDao.findCommonFriends(userId, otherUserId);
     }
 
-    private void validateFriendId(long userId, long friendId) {
+    private void validateFriendId(int userId, int friendId) {
         if (userId == friendId) {
             throw new IncorrectFriendIdException("id пользователей совпадают");
         }
-    }
-
-    private void validateName(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
-
-    private void validateFriends(User user) {
-        if (user.getFriends() == null) {
-            user.setFriends(new HashSet<>());
-        }
-    }
-
-    private void deleteAllFriends(long userId) {
-        log.debug("+ deleteAllFriends: {}", userId);
-
-        User targetUser = findUser(userId);
-
-        for (User friend : findFriends(userId)) {
-            friend.getFriends().remove(userId);
-            userStorage.updateUser(friend);
-        }
-
-        targetUser.getFriends().clear();
-        userStorage.updateUser(targetUser);
     }
 }
