@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.entity.Film;
+import ru.yandex.practicum.filmorate.entity.Genre;
 import ru.yandex.practicum.filmorate.entity.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmServiceDbImpl;
 import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
@@ -32,7 +33,7 @@ public class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private FilmServiceDbImpl filmServiceDbImpl;
+    private FilmServiceDbImpl filmService;
 
     @BeforeAll
     static void createMapper() {
@@ -49,15 +50,15 @@ public class FilmControllerTest {
         final Film secondFilm = new Film(2, "TestFilm2", "Description",
                 LocalDate.parse("2020-06-01"), 200, new Mpa(1, "R"), new HashSet<>());
 
-        final List<Film> filmWithGenres = List.of(firstFilm, secondFilm);
+        final List<Film> films = List.of(firstFilm, secondFilm);
 
-        when(filmServiceDbImpl.findAllFilms()).thenReturn(filmWithGenres);
+        when(filmService.findAllFilms()).thenReturn(films);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(filmWithGenres)));
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(films)));
     }
 
     @Test
@@ -65,9 +66,9 @@ public class FilmControllerTest {
             "в теле")
     void shouldReturnFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>());
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
 
-        when(filmServiceDbImpl.findFilm(testFilm.getId())).thenReturn(testFilm);
+        when(filmService.findFilm(testFilm.getId())).thenReturn(testFilm);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/films/" + testFilm.getId()))
                 .andDo(MockMvcResultHandlers.print())
@@ -79,10 +80,10 @@ public class FilmControllerTest {
     @Test
     @DisplayName("POST /films возвращает HTTP-ответ со статусом 200 и фильмом в теле")
     void shouldCreateNewFilm() throws Exception {
-        final Film testFilm = new Film(0, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>());
+        final Film testFilm = new Film(1, "TestFilm1", "Description",
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
 
-        when(filmServiceDbImpl.createFilm(testFilm)).thenReturn(testFilm);
+        when(filmService.createFilm(testFilm)).thenReturn(testFilm);
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,10 +98,10 @@ public class FilmControllerTest {
     @DisplayName("POST /films при получении некорректных данных возвращает HTTP-ответ со статусом 400 и сообщениями " +
             "об ошибках валидации в теле")
     void shouldNotCreateNewFilmWhenDataIncorrect() throws Exception {
-        final Film testFilm = new Film(0, "", "Description ......................................" +
+        final Film testFilm = new Film(1, "", "Description ......................................" +
                 "..................................................................................................." +
                 "......................................................................................... is to big",
-                LocalDate.parse("1140-10-25"), -200, new HashSet<>());
+                LocalDate.parse("1140-10-25"), -200, new Mpa(1, "R"), new HashSet<>());
         final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
                 new Violation("name", "must not be blank"),
                 new Violation("description", "size must be between 0 and 200"),
@@ -119,9 +120,9 @@ public class FilmControllerTest {
     @DisplayName("PUT /films возвращает HTTP-ответ со статусом 200 и фильмом в теле")
     void shouldUpdateFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>());
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
 
-        when(filmServiceDbImpl.updateFilm(testFilm)).thenReturn(testFilm);
+        when(filmService.updateFilm(testFilm)).thenReturn(testFilm);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +140,7 @@ public class FilmControllerTest {
         final Film testFilm = new Film(1, "", "Description ..............................." +
                 "..................................................................................................." +
                 "......................................................................................... is to big",
-                LocalDate.parse("1140-10-25"), -200, new HashSet<>());
+                LocalDate.parse("1140-10-25"), -200, new Mpa(1, "R"), new HashSet<>());
         final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
                 new Violation("name", "must not be blank"),
                 new Violation("description", "size must be between 0 and 200"),
@@ -155,17 +156,9 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /films возвращает HTTP-ответ со статусом 200")
-    void shouldDeleteAllFilms() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/films"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-
-    @Test
     @DisplayName("DELETE /films/{id} возвращает HTTP-ответ со статусом 200")
     void shouldDeleteFilm() throws Exception {
-        final long testId = 1;
+        final int testId = 1;
 
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + testId))
                 .andDo(MockMvcResultHandlers.print())
@@ -173,52 +166,30 @@ public class FilmControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200")
+    @DisplayName("PUT /films/{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200")
     void shouldAddLikeToFilm() throws Exception {
-        final Film testFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(10L)));
-        final long userId = 10;
+        final int testFilmId = 1;
+        final int userId = 10;
 
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/films/" + testFilm.getId() + "/like/" + userId))
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/films/" + testFilmId + "/like/" + userId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @DisplayName("DELETE /{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200")
+    @DisplayName("DELETE /films/{filmId}/like/{userId} возвращает HTTP-ответ со статусом 200")
     void shouldDeleteLikeOfFilm() throws Exception {
-        final Film testFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>());
+        final int testFilmId = 1;
         final long userId = 10;
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + testFilm.getId() + "/like/" + userId))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + testFilmId + "/like/" + userId))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @DisplayName("GET /films/popular?count={count} возвращает HTTP-ответ со статусом 200")
-    void shouldReturnPopularFilms() throws Exception {
-        final Film firstFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new HashSet<>());
-        final Film secondFilm = new Film(2, "TestFilm2", "Description",
-                LocalDate.parse("2020-06-01"), 200, new HashSet<>());
-        final int count = 2;
-
-        final List<Film> filmWithGenres = List.of(firstFilm, secondFilm);
-
-        when(filmServiceDbImpl.getPopularFilms(count)).thenReturn(filmWithGenres);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/films/popular?count=" + count))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(filmWithGenres)));
-    }
-
-    @Test
-    @DisplayName("DELETE /{filmId}/like/{userId} при получении некорректных id возвращает HTTP-ответ со статусом 400" +
-            " и сообщениями об ошибках валидации в теле")
+    @DisplayName("DELETE /films/{filmId}/like/{userId} при получении некорректных id возвращает HTTP-ответ со статусом" +
+            " 400 и сообщениями об ошибках валидации в теле")
     void shouldNotReturnPopularFilmsWhenCountIncorrect() throws Exception {
         final int count = 0;
         final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
@@ -230,4 +201,91 @@ public class FilmControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResult)));
     }
+
+    @Test
+    @DisplayName("GET /films/popular?count={count} возвращает HTTP-ответ со статусом 200")
+    void shouldReturnPopularFilms() throws Exception {
+        final Film firstFilm = new Film(1, "TestFilm1", "Description",
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
+        final Film secondFilm = new Film(2, "TestFilm2", "Description",
+                LocalDate.parse("2020-06-01"), 200, new Mpa(1, "R"), new HashSet<>());
+        final int count = 2;
+
+        final List<Film> films = List.of(firstFilm, secondFilm);
+
+        when(filmService.getPopularFilms(count)).thenReturn(films);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/films/popular?count=" + count))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(films)));
+    }
+
+    @Test
+    @DisplayName("GET /genres возвращает HTTP-ответ со статусом 200, типом данных application/json и списком жанров " +
+            "в теле")
+    void shouldReturnAllGenres() throws Exception {
+        final Genre firstGenre = new Genre(1, "Комедия");
+        final Genre secondGenre = new Genre(2, "Боевик");
+
+        final List<Genre> genres = List.of(firstGenre, secondGenre);
+
+        when(filmService.getAllGenres()).thenReturn(genres);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/genres"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(genres)));
+    }
+
+    @Test
+    @DisplayName("GET /genres/{id} возвращает HTTP-ответ со статусом 200, типом данных application/json и жанром " +
+            "в теле")
+    void shouldReturnGenre() throws Exception {
+        final Genre testGenre = new Genre(1, "Комедия");
+
+        when(filmService.getGenreById(testGenre.getId())).thenReturn(testGenre);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/genres/" + testGenre.getId()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testGenre)));
+    }
+
+    @Test
+    @DisplayName("GET /mpa возвращает HTTP-ответ со статусом 200, типом данных application/json и списком MPA " +
+            "в теле")
+    void shouldReturnAllMpa() throws Exception {
+        final Mpa firstMpa = new Mpa(1, "R");
+        final Mpa secondMpa = new Mpa(2, "PG-13");
+
+        final List<Mpa> mpa = List.of(firstMpa, secondMpa);
+
+        when(filmService.getAllMpa()).thenReturn(mpa);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/mpa"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(mpa)));
+    }
+
+    @Test
+    @DisplayName("GET /mpa/{id} возвращает HTTP-ответ со статусом 200, типом данных application/json и MPA " +
+            "в теле")
+    void shouldReturnMpa() throws Exception {
+        final Mpa testMpa = new Mpa(1, "R");
+
+        when(filmService.getMpaById(testMpa.getId())).thenReturn(testMpa);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/mpa/" + testMpa.getId()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testMpa)));
+    }
 }
+
