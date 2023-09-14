@@ -15,6 +15,4 @@ public interface FilmDao {
     void update(Film film);
 
     void deleteById(int id);
-
-    List<Film> findPopularFilms();
 }

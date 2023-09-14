@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.dao.film;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.entity.Film;
-import ru.yandex.practicum.filmorate.dao.impl.FilmCrudDaoInMemoryImpl;
 
 import java.time.LocalDate;
 import java.util.HashSet;

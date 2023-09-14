@@ -6,17 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import ru.yandex.practicum.filmorate.dao.impl.FilmCrudDaoImpl;
-
-import static org.junit.jupiter.api.Assertions.*;
+import ru.yandex.practicum.filmorate.dao.impl.FilmDaoDbImpl;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-class FilmCrudDaoImplTest {
+class FilmDaoDbImplTest {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
     @Autowired
-    private FilmCrudDaoImpl filmCrudDao;
+    private FilmDaoDbImpl filmCrudDao;
 
     @Test
     @DisplayName("Возвращает список всех фильмов")

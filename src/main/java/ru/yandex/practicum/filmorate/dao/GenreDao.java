@@ -8,6 +8,8 @@ import java.util.Set;
 
 public interface GenreDao {
     List<Genre> findAll();
+
     Optional<Genre> findById(int id);
+
     Set<Genre> findByFilmId(int filmId);
 }

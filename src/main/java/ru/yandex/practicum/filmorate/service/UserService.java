@@ -1,118 +1,25 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.FriendDao;
-import ru.yandex.practicum.filmorate.dao.UserDao;
-import ru.yandex.practicum.filmorate.exception.FriendNotFoundException;
-import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
-import ru.yandex.practicum.filmorate.exception.IncorrectFriendIdException;
 import ru.yandex.practicum.filmorate.entity.User;
-import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-@Slf4j
-public class UserService {
-    private final UserDao userDao;
-    private final FriendDao friendDao;
+public interface UserService {
+    List<User> findAllUsers();
 
-    @Autowired
-    public UserService(UserDao userDao, FriendDao friendDao) {
-        this.userDao = userDao;
-        this.friendDao = friendDao;
-    }
+    User findUser(int id);
 
-    public List<User> findAllUsers() {
-        return userDao.findAll();
-    }
+    User createUser(User user);
 
-    public User findUser(int id) {
-        return userDao.findById(id).orElseThrow(() -> new IdNotFoundException("пользователь с заданным id не найден",
-                "пользователь"));
-    }
+    User updateUser(User user);
 
-    public User createUser(User user) {
-        log.debug("+ createUser: {}", user);
+    void deleteUser(int id);
 
-        if (user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+    void addFriend(int userId, int friendId);
 
-        user.setId(userDao.save(user));
+    void deleteFriend(int userId, int friendId);
 
-        return user;
-    }
+    List<User> findFriends(int userId);
 
-    public User updateUser(User user) {
-        log.debug("+ updateUser: {}", user);
-
-        User targetUser = findUser(user.getId());
-
-        targetUser.setEmail(user.getEmail());
-        targetUser.setLogin(user.getLogin());
-        targetUser.setName(user.getName());
-        targetUser.setBirthday(user.getBirthday());
-
-        userDao.update(user);
-        return targetUser;
-    }
-
-    public void deleteUser(int id) {
-        log.debug("+ deleteUser: {}", id);
-
-        findUser(id);
-
-        userDao.deleteById(id);
-    }
-
-    public void addFriend(int userId, int friendId) {
-        log.debug("+ addFriend: {}, {}", userId, friendId);
-
-        findUser(userId);
-        findUser(friendId);
-        validateFriendId(userId, friendId);
-
-        friendDao.save(userId, friendId);
-
-        if (friendDao.findById(friendId, userId).isPresent()) {
-            friendDao.update(userId, friendId, true);
-            friendDao.update(friendId, userId, true);
-        }
-    }
-
-    public void deleteFriend(int userId, int friendId) {
-        log.debug("+ deleteFriend: {}, {}", userId, friendId);
-
-        findUser(userId);
-        findUser(friendId);
-        validateFriendId(userId, friendId);
-
-        friendDao.deleteById(userId, friendId);
-
-        if(friendDao.findById(friendId, userId).isPresent()) {
-            friendDao.update(friendId, userId, false);
-        }
-    }
-
-    public List<User> findFriends(int userId) {
-
-        return userDao.findFriendsById(userId);
-    }
-
-    public List<User> findCommonFriends(int userId, int otherUserId) {
-        validateFriendId(userId, otherUserId);
-
-        return userDao.findCommonFriends(userId, otherUserId);
-    }
-
-    private void validateFriendId(int userId, int friendId) {
-        if (userId == friendId) {
-            throw new IncorrectFriendIdException("id пользователей совпадают");
-        }
-    }
+    List<User> findCommonFriends(int userId, int otherUserId);
 }

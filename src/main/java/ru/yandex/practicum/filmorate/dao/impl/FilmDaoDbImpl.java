@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Qualifier("filmCrudDaoImpl")
+@Qualifier("filmDaoDbImpl")
 @Slf4j
-public class FilmCrudDaoImpl implements FilmDao {
+public class FilmDaoDbImpl implements FilmDao {
     private static final String FIND_ALL_QUERY = "SELECT f.id, f.name film_name, f.description, f.release_date," +
             " f.duration, m.id mpa_id, m.name mpa_name FROM public.films f JOIN public.mpa m ON f.mpa_id = m.id";
     private static final String FIND_BY_ID_QUERY = "SELECT f.id, f.name film_name, f.description, f.release_date," +
@@ -49,10 +49,10 @@ public class FilmCrudDaoImpl implements FilmDao {
                     resultSet.getString("mpa_name")))
             .build();
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmCrudDaoImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    public FilmDaoDbImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -60,8 +60,7 @@ public class FilmCrudDaoImpl implements FilmDao {
     public List<Film> findAll() {
         try {
             return jdbcTemplate.query(FIND_ALL_QUERY, ROW_MAPPER);
-        }
-        catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             return new ArrayList<>();
         }
     }
@@ -73,8 +72,7 @@ public class FilmCrudDaoImpl implements FilmDao {
 
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, parameters, ROW_MAPPER));
-        }
-        catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
@@ -88,7 +86,7 @@ public class FilmCrudDaoImpl implements FilmDao {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(SAVE_QUERY, parameters, keyHolder, new String[] {"id"});
+        jdbcTemplate.update(SAVE_QUERY, parameters, keyHolder, new String[]{"id"});
 
         return keyHolder.getKey().intValue();
     }
@@ -111,11 +109,6 @@ public class FilmCrudDaoImpl implements FilmDao {
         parameters.addValue("id", id);
 
         jdbcTemplate.update(DELETE_BY_ID_QUERY, parameters);
-    }
-
-    @Override
-    public List<Film> findPopularFilms() {
-        return jdbcTemplate.query(FIND_POPULAR_FILMS_QUERY, ROW_MAPPER);
     }
 
     private void insertParameters(MapSqlParameterSource parameters, Film film) {

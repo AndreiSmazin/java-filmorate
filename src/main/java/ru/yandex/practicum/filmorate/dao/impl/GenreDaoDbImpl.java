@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -17,8 +17,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
+@Qualifier("genreDaoDbImpl")
 @Slf4j
-public class GenreCrudDaoImpl implements GenreDao {
+public class GenreDaoDbImpl implements GenreDao {
     private static final String FIND_ALL_QUERY = "SELECT id, name FROM public.genre ORDER BY id";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM public.genre WHERE id = :id";
     private static final String FIND_BY_FILM_ID_QUERY = "SELECT g.id, g.name FROM public.genres gs" +
@@ -28,10 +29,10 @@ public class GenreCrudDaoImpl implements GenreDao {
             .name(resultSet.getString("name"))
             .build();
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    public GenreCrudDaoImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    public GenreDaoDbImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -47,8 +48,7 @@ public class GenreCrudDaoImpl implements GenreDao {
 
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, parameters, ROW_MAPPER));
-        }
-        catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }

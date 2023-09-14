@@ -6,8 +6,6 @@ import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.entity.User;
-import ru.yandex.practicum.filmorate.dao.impl.FilmCrudDaoInMemoryImpl;
-import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -25,7 +23,7 @@ import static org.mockito.Mockito.when;
 public class FilmServiceTest {
     private final FilmDao filmDao = new FilmCrudDaoInMemoryImpl();
     private final UserStorage userStorage = mock(UserStorage.class);
-    private final FilmService filmService = new FilmService(filmDao, userStorage);
+    private final FilmServiceDbImpl filmServiceDbImpl = new FilmServiceDbImpl(filmDao, userStorage);
 
     final Film film1 = new Film(1, "TestFilm1", "Description",
             LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L)));
@@ -49,16 +47,16 @@ public class FilmServiceTest {
             LocalDate.parse("1991-12-25"), 200, new HashSet<>(List.of(1L, 2L, 3L, 4L)));
 
     private void createTestFilms() {
-        filmService.createFilm(film1);
-        filmService.createFilm(film2);
-        filmService.createFilm(film3);
-        filmService.createFilm(film4);
-        filmService.createFilm(film5);
-        filmService.createFilm(film6);
-        filmService.createFilm(film7);
-        filmService.createFilm(film8);
-        filmService.createFilm(film9);
-        filmService.createFilm(film10);
+        filmServiceDbImpl.createFilm(film1);
+        filmServiceDbImpl.createFilm(film2);
+        filmServiceDbImpl.createFilm(film3);
+        filmServiceDbImpl.createFilm(film4);
+        filmServiceDbImpl.createFilm(film5);
+        filmServiceDbImpl.createFilm(film6);
+        filmServiceDbImpl.createFilm(film7);
+        filmServiceDbImpl.createFilm(film8);
+        filmServiceDbImpl.createFilm(film9);
+        filmServiceDbImpl.createFilm(film10);
     }
 
     @Test
@@ -70,11 +68,11 @@ public class FilmServiceTest {
 
         when(filmDao.getFilm(testId)).thenReturn(Optional.of(film2));
 
-        assertEquals(film2, filmService.findFilm(testId), "Фильм не совпадает с ожидаемым");
+        assertEquals(film2, filmServiceDbImpl.findFilm(testId), "Фильм не совпадает с ожидаемым");
 
         final IdNotFoundException e = assertThrows(
                 IdNotFoundException.class,
-                () -> filmService.findFilm(wrongTestId));
+                () -> filmServiceDbImpl.findFilm(wrongTestId));
 
         assertEquals("фильм с заданным id не найден", e.getMessage(), "Сообщение об исключении не " +
                 "соответствует ожидаемому");
@@ -91,7 +89,7 @@ public class FilmServiceTest {
                 LocalDate.parse("2019-04-12"), 186, new HashSet<>());
         createTestFilms();
 
-        final Film returnedFilm = filmService.createFilm(testFilm);
+        final Film returnedFilm = filmServiceDbImpl.createFilm(testFilm);
 
         assertEquals(expectedId, returnedFilm.getId(), "id не соответствует ожидаемому");
         assertNotNull(returnedFilm.getLikes(), "Поле likes не должно быть null");
@@ -110,14 +108,14 @@ public class FilmServiceTest {
                 LocalDate.parse("2020-06-01"), 195, new HashSet<>());
         createTestFilms();
 
-        final Film returnedFilm = filmService.updateFilm(expectedFilm);
+        final Film returnedFilm = filmServiceDbImpl.updateFilm(expectedFilm);
 
         assertNotNull(returnedFilm.getLikes(), "Поле likes не должно быть null");
         assertEquals(expectedFilm, returnedFilm, "Возвращаемый фильм не соответствует ожидаемому");
 
         final IdNotFoundException e = assertThrows(
                 IdNotFoundException.class,
-                () -> filmService.updateFilm(incorrectChangedTestFilm)
+                () -> filmServiceDbImpl.updateFilm(incorrectChangedTestFilm)
         );
 
         assertEquals("фильм с заданным id не найден", e.getMessage(), "Сообщение об исключении не " +
@@ -133,7 +131,7 @@ public class FilmServiceTest {
 
         final IdNotFoundException e = assertThrows(
                 IdNotFoundException.class,
-                () -> filmService.deleteFilm(wrongTestId)
+                () -> filmServiceDbImpl.deleteFilm(wrongTestId)
         );
 
         assertEquals("фильм с заданным id не найден", e.getMessage(), "Сообщение об исключении не " +
@@ -151,7 +149,7 @@ public class FilmServiceTest {
         when(userStorage.getUser(userId)).thenReturn(Optional.of(new User(6, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
                 new HashSet<>(List.of(4L)))));
-        filmService.addLike(testFilm.getId(), userId);
+        filmServiceDbImpl.addLike(testFilm.getId(), userId);
 
         assertTrue(filmDao.getFilm(testFilm.getId()).get().getLikes().contains(userId),
                 "Лайк пользователя не добавлен в список лайков фильма");
@@ -169,7 +167,7 @@ public class FilmServiceTest {
         when(userStorage.getUser(userId)).thenReturn(Optional.of(new User(5, "User1Mail@google.com",
                 "User6", "Ivan Ivanov", LocalDate.parse("1991-05-23"),
                 new HashSet<>(List.of(4L)))));
-        filmService.deleteLike(testFilm.getId(), userId);
+        filmServiceDbImpl.deleteLike(testFilm.getId(), userId);
 
         assertFalse(filmDao.getFilm(testFilm.getId()).get().getLikes().contains(userId),
                 "Лайк пользователя не удален из списка лайков фильма");
@@ -181,7 +179,7 @@ public class FilmServiceTest {
 
         final LikeNotFoundException e = assertThrows(
                 LikeNotFoundException.class,
-                () -> filmService.deleteLike(testFilm.getId(), wrongUserId)
+                () -> filmServiceDbImpl.deleteLike(testFilm.getId(), wrongUserId)
         );
 
         assertEquals("Лайк пользователя с заданным id не найден в списке лайков фильма " +
@@ -194,7 +192,7 @@ public class FilmServiceTest {
         final List<Film> expectedList = List.of(film6, film4, film10, film2, film5);
         createTestFilms();
 
-        assertEquals(expectedList, filmService.getPopularFilms(5), "Возвращенный список не " +
+        assertEquals(expectedList, filmServiceDbImpl.getPopularFilms(5), "Возвращенный список не " +
                 "соответствует ожидаемому");
     }
 }

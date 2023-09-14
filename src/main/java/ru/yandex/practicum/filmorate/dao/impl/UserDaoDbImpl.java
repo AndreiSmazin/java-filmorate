@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -17,8 +17,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Qualifier("userDaoDbImpl")
 @Slf4j
-public class UserCrudDaoImpl implements UserDao {
+public class UserDaoDbImpl implements UserDao {
     private static final String FIND_ALL_QUERY = "SELECT id, email, login, user_name, birthday FROM public.users";
     private static final String FIND_BY_ID_QUERY = "SELECT id, email, login, user_name, birthday FROM public.users" +
             " WHERE id = :id";
@@ -27,13 +28,7 @@ public class UserCrudDaoImpl implements UserDao {
     private static final String UPDATE_QUERY = "UPDATE public.users SET email = :email, login = :login," +
             " user_name = :userName, birthday = :birthday WHERE id = :id";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM public.users WHERE id = :id";
-    private static final String FIND_FRIENDS_BY_ID_QUERY = "SELECT id, email, login, user_name, birthday" +
-            " FROM public.users WHERE id IN" +
-            " (SELECT friend_id FROM public.friend WHERE user_id = :id)";
-    private static final String FIND_COMMON_FRIENDS_QUERY = "SELECT id, email, login, user_name, birthday" +
-            " FROM public.users WHERE id IN" +
-            " (SELECT friend_id FROM public.friend WHERE user_id = :id)" +
-            " AND id IN (SELECT friend_id FROM public.friend WHERE user_id = :otherId)";
+
     private static final RowMapper<User> ROW_MAPPER = (resultSet, i) -> User.builder()
             .id(resultSet.getInt("id"))
             .email(resultSet.getString("email"))
@@ -42,10 +37,10 @@ public class UserCrudDaoImpl implements UserDao {
             .birthday(resultSet.getDate("birthday").toLocalDate())
             .build();
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    public UserCrudDaoImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    public UserDaoDbImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -61,8 +56,7 @@ public class UserCrudDaoImpl implements UserDao {
 
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, parameters, ROW_MAPPER));
-        }
-        catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
@@ -76,7 +70,7 @@ public class UserCrudDaoImpl implements UserDao {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(SAVE_QUERY, parameters, keyHolder, new String[] {"id"});
+        jdbcTemplate.update(SAVE_QUERY, parameters, keyHolder, new String[]{"id"});
 
         return keyHolder.getKey().intValue();
     }
@@ -99,23 +93,6 @@ public class UserCrudDaoImpl implements UserDao {
         parameters.addValue("id", id);
 
         jdbcTemplate.update(DELETE_BY_ID_QUERY, parameters);
-    }
-
-    @Override
-    public List<User> findFriendsById(int id) {
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        parameters.addValue("id", id);
-
-        return jdbcTemplate.query(FIND_FRIENDS_BY_ID_QUERY, parameters, ROW_MAPPER);
-    }
-
-    @Override
-    public List<User> findCommonFriends(int id, int otherId) {
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        parameters.addValue("id", id);
-        parameters.addValue("otherId", otherId);
-
-        return jdbcTemplate.query(FIND_COMMON_FRIENDS_QUERY, parameters, ROW_MAPPER);
     }
 
     private void insertParameters(MapSqlParameterSource parameters, User user) {

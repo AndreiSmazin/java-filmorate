@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @AllArgsConstructor
@@ -10,5 +11,6 @@ import lombok.Data;
 public class Friend {
     private int userId;
     private int friendId;
+    @EqualsAndHashCode.Exclude
     private boolean isApproved;
 }

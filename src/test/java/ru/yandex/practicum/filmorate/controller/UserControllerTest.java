@@ -15,8 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.entity.User;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.dao.user.UserStorage;
+import ru.yandex.practicum.filmorate.service.UserServiceAbstractImpl;
 import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
 import ru.yandex.practicum.filmorate.valid.Violation;
 
@@ -32,7 +31,7 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private UserService userService;
+    private UserServiceAbstractImpl userServiceAbstractImpl;
     @MockBean
     private UserStorage userStorage;
 
@@ -53,7 +52,7 @@ public class UserControllerTest {
 
         final List<User> users = List.of(firstUser, secondUser);
 
-        when(userService.findAllUsers()).thenReturn(users);
+        when(userServiceAbstractImpl.findAllUsers()).thenReturn(users);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andDo(MockMvcResultHandlers.print())
@@ -69,7 +68,7 @@ public class UserControllerTest {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        when(userService.findUser(1)).thenReturn(testUser);
+        when(userServiceAbstractImpl.findUser(1)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testUser.getId()))
                 .andDo(MockMvcResultHandlers.print())
@@ -84,7 +83,7 @@ public class UserControllerTest {
         final User testUser = new User(0, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        when(userService.createUser(testUser)).thenReturn(testUser);
+        when(userServiceAbstractImpl.createUser(testUser)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +119,7 @@ public class UserControllerTest {
         final User testUser = new User(1, "User1Mail@google.com", "User1", "Ivan Ivanov",
                 LocalDate.parse("1991-05-23"), new HashSet<>());
 
-        when(userService.updateUser(testUser)).thenReturn(testUser);
+        when(userServiceAbstractImpl.updateUser(testUser)).thenReturn(testUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -206,7 +205,7 @@ public class UserControllerTest {
 
         final List<User> friends = List.of(firstUser, secondUser);
 
-        when(userService.findFriends(testId)).thenReturn(friends);
+        when(userServiceAbstractImpl.findFriends(testId)).thenReturn(friends);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testId + "/friends"))
                 .andDo(MockMvcResultHandlers.print())
@@ -228,7 +227,7 @@ public class UserControllerTest {
 
         final List<User> friends = List.of(firstUser, secondUser);
 
-        when(userService.findCommonFriends(firstTestId, secondTestId)).thenReturn(friends);
+        when(userServiceAbstractImpl.findCommonFriends(firstTestId, secondTestId)).thenReturn(friends);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + firstTestId + "/friends/common/" +
                         secondTestId))

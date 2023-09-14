@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -15,8 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Qualifier("mpaDaoDbImpl")
 @Slf4j
-public class MpaCrudDaoImpl implements MpaDao {
+public class MpaDaoDbImpl implements MpaDao {
     private static final String FIND_ALL_QUERY = "SELECT id, name FROM public.mpa ORDER BY id";
     private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM public.mpa WHERE id = :id";
     private static final RowMapper<Mpa> ROW_MAPPER = (resultSet, i) -> Mpa.builder()
@@ -24,10 +25,10 @@ public class MpaCrudDaoImpl implements MpaDao {
             .name(resultSet.getString("name"))
             .build();
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    public MpaCrudDaoImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    public MpaDaoDbImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

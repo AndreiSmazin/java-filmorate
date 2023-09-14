@@ -8,21 +8,38 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.LikeDao;
+import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.Like;
+import ru.yandex.practicum.filmorate.entity.Mpa;
 
 import java.util.List;
 
 @Repository
-@Qualifier("likeCrudDaoImpl")
+@Qualifier("likeDaoDbImpl")
 @Slf4j
-public class LikeCrudDaoImpl implements LikeDao {
-    private NamedParameterJdbcTemplate jdbcTemplate;
+public class LikeDaoDbImpl implements LikeDao {
     private static final String SAVE_QUERY = "INSERT INTO public.likes (film_id, user_id) VALUES (:filmId, :userId)";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM public.likes WHERE (film_id = :filmId) AND" +
             " (user_id = :userId)";
+    private static final String FIND_POPULAR_FILMS_QUERY = "SELECT f.id, f.name film_name, f.description," +
+            " f.release_date, f.duration, m.id mpa_id, m.name mpa_name, COUNT(l.film_id) likes FROM public.films f" +
+            " JOIN public.mpa m ON f.mpa_id = m.id LEFT JOIN public.likes l ON f.id = l.film_id" +
+            " GROUP BY f.id ORDER BY likes DESC";
+
+    private static final RowMapper<Film> ROW_MAPPER = (resultSet, i) -> Film.builder()
+            .id(resultSet.getInt("id"))
+            .name(resultSet.getString("film_name"))
+            .description(resultSet.getString("description"))
+            .releaseDate(resultSet.getDate("release_date").toLocalDate())
+            .duration(resultSet.getInt("duration"))
+            .mpa(new Mpa(resultSet.getInt("mpa_id"),
+                    resultSet.getString("mpa_name")))
+            .build();
+
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    public LikeCrudDaoImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public LikeDaoDbImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         jdbcTemplate = namedParameterJdbcTemplate;
     }
 
@@ -46,5 +63,10 @@ public class LikeCrudDaoImpl implements LikeDao {
         parameters.addValue("userId", likeId);
 
         jdbcTemplate.update(DELETE_BY_ID_QUERY, parameters);
+    }
+
+    @Override
+    public List<Film> findPopularFilms() {
+        return jdbcTemplate.query(FIND_POPULAR_FILMS_QUERY, ROW_MAPPER);
     }
 }
