@@ -6,7 +6,10 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.GenreDao;
 import ru.yandex.practicum.filmorate.entity.Genre;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -38,10 +41,10 @@ public class GenreDaoInMemoryImpl implements GenreDao {
     }
 
     @Override
-    public Set<Genre> findByFilmId(int filmId) {
+    public List<Genre> findByFilmId(int filmId) {
         return genresDao.getFilmGenres().stream()
                 .filter(filmGenre -> filmGenre.getFilmId() == filmId)
                 .map(filmGenre -> genres.get(filmGenre.getGenreId()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 }

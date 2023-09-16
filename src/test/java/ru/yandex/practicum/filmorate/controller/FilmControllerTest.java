@@ -22,7 +22,7 @@ import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
 import ru.yandex.practicum.filmorate.valid.Violation;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -46,9 +46,9 @@ public class FilmControllerTest {
             "в теле")
     void shouldReturnAllFilms() throws Exception {
         final Film firstFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new ArrayList<>(), 0);
         final Film secondFilm = new Film(2, "TestFilm2", "Description",
-                LocalDate.parse("2020-06-01"), 200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("2020-06-01"), 200, new Mpa(1, "R"), new ArrayList<>(), 0);
 
         final List<Film> films = List.of(firstFilm, secondFilm);
 
@@ -66,7 +66,7 @@ public class FilmControllerTest {
             "в теле")
     void shouldReturnFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new ArrayList<>(), 0);
 
         when(filmService.findFilm(testFilm.getId())).thenReturn(testFilm);
 
@@ -81,7 +81,7 @@ public class FilmControllerTest {
     @DisplayName("POST /films возвращает HTTP-ответ со статусом 200 и фильмом в теле")
     void shouldCreateNewFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new ArrayList<>(), 0);
 
         when(filmService.createFilm(testFilm)).thenReturn(testFilm);
 
@@ -101,7 +101,7 @@ public class FilmControllerTest {
         final Film testFilm = new Film(1, "", "Description ......................................" +
                 "..................................................................................................." +
                 "......................................................................................... is to big",
-                LocalDate.parse("1140-10-25"), -200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("1140-10-25"), -200, new Mpa(1, "R"), new ArrayList<>(), 0);
         final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
                 new Violation("name", "must not be blank"),
                 new Violation("description", "size must be between 0 and 200"),
@@ -120,7 +120,7 @@ public class FilmControllerTest {
     @DisplayName("PUT /films возвращает HTTP-ответ со статусом 200 и фильмом в теле")
     void shouldUpdateFilm() throws Exception {
         final Film testFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new ArrayList<>(), 0);
 
         when(filmService.updateFilm(testFilm)).thenReturn(testFilm);
 
@@ -140,7 +140,7 @@ public class FilmControllerTest {
         final Film testFilm = new Film(1, "", "Description ..............................." +
                 "..................................................................................................." +
                 "......................................................................................... is to big",
-                LocalDate.parse("1140-10-25"), -200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("1140-10-25"), -200, new Mpa(1, "R"), new ArrayList<>(), 0);
         final ValidationErrorResponse expectedResult = new ValidationErrorResponse(List.of(
                 new Violation("name", "must not be blank"),
                 new Violation("description", "size must be between 0 and 200"),
@@ -206,9 +206,9 @@ public class FilmControllerTest {
     @DisplayName("GET /films/popular?count={count} возвращает HTTP-ответ со статусом 200")
     void shouldReturnPopularFilms() throws Exception {
         final Film firstFilm = new Film(1, "TestFilm1", "Description",
-                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("1991-12-25"), 200, new Mpa(1, "R"), new ArrayList<>(), 0);
         final Film secondFilm = new Film(2, "TestFilm2", "Description",
-                LocalDate.parse("2020-06-01"), 200, new Mpa(1, "R"), new HashSet<>());
+                LocalDate.parse("2020-06-01"), 200, new Mpa(1, "R"), new ArrayList<>(), 0);
         final int count = 2;
 
         final List<Film> films = List.of(firstFilm, secondFilm);

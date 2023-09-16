@@ -11,10 +11,9 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.GenreDao;
 import ru.yandex.practicum.filmorate.entity.Genre;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 @Qualifier("genreDaoDbImpl")
@@ -54,10 +53,10 @@ public class GenreDaoDbImpl implements GenreDao {
     }
 
     @Override
-    public Set<Genre> findByFilmId(int filmId) {
+    public List<Genre> findByFilmId(int filmId) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("filmId", filmId);
 
-        return new HashSet<>(jdbcTemplate.query(FIND_BY_FILM_ID_QUERY, parameters, ROW_MAPPER));
+        return new ArrayList<>(jdbcTemplate.query(FIND_BY_FILM_ID_QUERY, parameters, ROW_MAPPER));
     }
 }

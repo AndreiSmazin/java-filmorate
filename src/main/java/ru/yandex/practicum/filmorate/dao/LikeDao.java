@@ -11,4 +11,6 @@ public interface LikeDao {
     void deleteById(int filmId, int likeId);
 
     List<Film> findPopularFilms();
+
+    void updateFilmRate(int filmId, int rate);
 }

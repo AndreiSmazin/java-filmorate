@@ -24,20 +24,16 @@ import java.util.Optional;
 @Slf4j
 public class FilmDaoDbImpl implements FilmDao {
     private static final String FIND_ALL_QUERY = "SELECT f.id, f.name film_name, f.description, f.release_date," +
-            " f.duration, m.id mpa_id, m.name mpa_name FROM public.films f JOIN public.mpa m ON f.mpa_id = m.id";
+            " f.duration, m.id mpa_id, m.name mpa_name, f.rate FROM public.films f JOIN public.mpa m ON f.mpa_id = m.id";
     private static final String FIND_BY_ID_QUERY = "SELECT f.id, f.name film_name, f.description, f.release_date," +
-            " f.duration, m.id mpa_id, m.name mpa_name FROM public.films f JOIN public.mpa m ON f.mpa_id = m.id" +
+            " f.duration, m.id mpa_id, m.name mpa_name, f.rate FROM public.films f JOIN public.mpa m ON f.mpa_id = m.id" +
             " WHERE f.id = :id";
     private static final String SAVE_QUERY = "INSERT INTO public.films (name, description, release_date," +
-            " duration, mpa_id) VALUES (:name, :description, :releaseDate, :duration, :mpaId)";
+            " duration, mpa_id, rate) VALUES (:name, :description, :releaseDate, :duration, :mpaId, :rate)";
     private static final String UPDATE_QUERY = "UPDATE public.films SET name = :name," +
             " description = :description, release_date = :releaseDate, duration = :duration," +
             " mpa_id = :mpaId WHERE id = :id";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM public.films WHERE id = :id";
-    private static final String FIND_POPULAR_FILMS_QUERY = "SELECT f.id, f.name film_name, f.description," +
-            " f.release_date, f.duration, m.id mpa_id, m.name mpa_name, COUNT(l.film_id) likes FROM public.films f" +
-            " JOIN public.mpa m ON f.mpa_id = m.id LEFT JOIN public.likes l ON f.id = l.film_id" +
-            " GROUP BY f.id ORDER BY likes DESC";
 
     private static final RowMapper<Film> ROW_MAPPER = (resultSet, i) -> Film.builder()
             .id(resultSet.getInt("id"))
@@ -47,6 +43,7 @@ public class FilmDaoDbImpl implements FilmDao {
             .duration(resultSet.getInt("duration"))
             .mpa(new Mpa(resultSet.getInt("mpa_id"),
                     resultSet.getString("mpa_name")))
+            .rate(resultSet.getInt("rate"))
             .build();
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -118,5 +115,6 @@ public class FilmDaoDbImpl implements FilmDao {
         parameters.addValue("releaseDate", film.getReleaseDate());
         parameters.addValue("duration", film.getDuration());
         parameters.addValue("mpaId", film.getMpa().getId());
+        parameters.addValue("rate", film.getRate());
     }
 }

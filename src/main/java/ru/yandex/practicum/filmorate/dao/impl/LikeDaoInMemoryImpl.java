@@ -8,10 +8,8 @@ import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.Like;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,21 +40,13 @@ public class LikeDaoInMemoryImpl implements LikeDao {
 
     @Override
     public List<Film> findPopularFilms() {
-        Map<Integer, Integer> filmLikesCounters = new HashMap<>();
-
-        for (int filmId : filmDao.getFilms().keySet()) {
-            filmLikesCounters.put(filmId, 0);
-        }
-
-        for (Like like : likes) {
-            int likeCounter = filmLikesCounters.get(like.getFilmId());
-            filmLikesCounters.put(like.getFilmId(), likeCounter + 1);
-        }
-
         return filmDao.getFilms().values().stream()
-                .map(Film::getId)
-                .sorted(Comparator.comparing(filmLikesCounters::get).reversed())
-                .map(filmId -> filmDao.getFilms().get(filmId))
+                .sorted(Comparator.comparing(Film::getRate).reversed())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateFilmRate(int filmId, int rate) {
+        filmDao.getFilms().get(filmId).setRate(rate);
     }
 }

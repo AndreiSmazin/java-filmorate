@@ -13,8 +13,7 @@ import ru.yandex.practicum.filmorate.entity.Like;
 import ru.yandex.practicum.filmorate.entity.Mpa;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,18 +62,19 @@ public abstract class FilmServiceAbstractImpl {
     public Film createFilm(Film film) {
         log.debug("+ createFilm: {}", film);
 
+        film.setRate(0);
         film.setMpa(getMpaById(film.getMpa().getId()));
         film.setId(filmDao.save(film));
 
         if (film.getGenres() != null) {
             List<Genre> genres = film.getGenres().stream()
                     .map(genre -> getGenreById(genre.getId()))
+                    .distinct()
                     .peek(genre -> genresDao.save(film.getId(), genre.getId()))
-                    .sorted(Comparator.comparing(Genre::getId))
                     .collect(Collectors.toList());
-            film.setGenres(new HashSet<>(genres));
+            film.setGenres(genres);
         } else {
-            film.setGenres(new HashSet<>());
+            film.setGenres(new ArrayList<>());
         }
 
         return film;
@@ -96,12 +96,12 @@ public abstract class FilmServiceAbstractImpl {
             genresDao.deleteByFilmId(id);
             List<Genre> genres = film.getGenres().stream()
                     .map(genre -> getGenreById(genre.getId()))
+                    .distinct()
                     .peek(genre -> genresDao.save(film.getId(), genre.getId()))
-                    .sorted(Comparator.comparing(Genre::getId))
                     .collect(Collectors.toList());
-            targetFilm.setGenres(new HashSet<>(genres));
+            targetFilm.setGenres(genres);
         } else {
-            targetFilm.setGenres(new HashSet<>());
+            targetFilm.setGenres(new ArrayList<>());
         }
 
         filmDao.update(targetFilm);
@@ -120,19 +120,21 @@ public abstract class FilmServiceAbstractImpl {
     public void addLike(int filmId, int userId) {
         log.debug("+ addLike: {}, {}", filmId, userId);
 
-        findFilm(filmId);
+        int filmRate = findFilm(filmId).getRate();
         userService.findUser(userId);
 
         likeDao.save(new Like(filmId, userId));
+        likeDao.updateFilmRate(filmId, filmRate + 1);
     }
 
     public void deleteLike(int filmId, int userId) {
         log.debug("+ deleteLike: {}, {}", filmId, userId);
 
-        findFilm(filmId);
+        int filmRate = findFilm(filmId).getRate();
         userService.findUser(userId);
 
         likeDao.deleteById(filmId, userId);
+        likeDao.updateFilmRate(filmId, filmRate - 1);
     }
 
     public List<Film> getPopularFilms(int limit) {
@@ -161,7 +163,7 @@ public abstract class FilmServiceAbstractImpl {
     }
 
     public Mpa getMpaById(int id) {
-        return mpaDao.findById(id).orElseThrow(() -> new IdNotFoundException("рейтинг с заданным id не найден",
-                "рейтинг"));
+        return mpaDao.findById(id).orElseThrow(() -> new IdNotFoundException("MPA с заданным id не найден",
+                "MPA"));
     }
 }

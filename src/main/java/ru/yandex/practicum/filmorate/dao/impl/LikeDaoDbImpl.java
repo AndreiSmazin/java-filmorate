@@ -22,9 +22,10 @@ public class LikeDaoDbImpl implements LikeDao {
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM public.likes WHERE (film_id = :filmId) AND" +
             " (user_id = :userId)";
     private static final String FIND_POPULAR_FILMS_QUERY = "SELECT f.id, f.name film_name, f.description," +
-            " f.release_date, f.duration, m.id mpa_id, m.name mpa_name, COUNT(l.film_id) likes FROM public.films f" +
-            " JOIN public.mpa m ON f.mpa_id = m.id LEFT JOIN public.likes l ON f.id = l.film_id" +
-            " GROUP BY f.id ORDER BY likes DESC";
+            " f.release_date, f.duration, m.id mpa_id, m.name mpa_name, f.rate FROM public.films f" +
+            " JOIN public.mpa m ON f.mpa_id = m.id ORDER BY f.rate DESC";
+
+    private static final String UPDATE_RATE_QUERY = "UPDATE public.films SET rate = :rate WHERE id = :id";
 
     private static final RowMapper<Film> ROW_MAPPER = (resultSet, i) -> Film.builder()
             .id(resultSet.getInt("id"))
@@ -34,6 +35,7 @@ public class LikeDaoDbImpl implements LikeDao {
             .duration(resultSet.getInt("duration"))
             .mpa(new Mpa(resultSet.getInt("mpa_id"),
                     resultSet.getString("mpa_name")))
+            .rate(resultSet.getInt("rate"))
             .build();
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -68,5 +70,16 @@ public class LikeDaoDbImpl implements LikeDao {
     @Override
     public List<Film> findPopularFilms() {
         return jdbcTemplate.query(FIND_POPULAR_FILMS_QUERY, ROW_MAPPER);
+    }
+
+    @Override
+    public void updateFilmRate(int filmId, int rate) {
+        log.debug("+ update FilRate: {}, {}", filmId, rate);
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("id", filmId);
+        parameters.addValue("rate", rate);
+
+        jdbcTemplate.update(UPDATE_RATE_QUERY, parameters);
     }
 }
