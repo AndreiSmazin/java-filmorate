@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface FriendDao {
     Optional<Friend> findById(int userId, int friendId);
 
-    void save(int userId, int friendId);
+    void save(int userId, int friendId, boolean isApproved);
 
     void update(int userId, int friendId, boolean isApproved);
 

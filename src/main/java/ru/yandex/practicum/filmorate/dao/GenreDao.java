@@ -9,6 +9,4 @@ public interface GenreDao {
     List<Genre> findAll();
 
     Optional<Genre> findById(int id);
-
-    List<Genre> findByFilmId(int filmId);
 }

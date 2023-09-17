@@ -1,12 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.Genre;
 import ru.yandex.practicum.filmorate.entity.Mpa;
@@ -20,12 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
-@AutoConfigureTestDatabase
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class FilmServiceIntegrationTest {
-    private final FilmServiceDbImpl filmService;
+@AllArgsConstructor
+public abstract class FilmServiceIntegrationTest {
+    protected final UserService userService;
+    protected final FilmService filmService;
 
     final Film testFilm1 = Film.builder().id(1)
             .name("Американский пирог")
@@ -44,8 +38,7 @@ public class FilmServiceIntegrationTest {
             .releaseDate(LocalDate.parse("2014-10-26"))
             .duration(169)
             .mpa(new Mpa(3, "PG-13"))
-            .genres(List.of(new Genre(2, "Драма"), new Genre(7, "Фантастика"),
-                    new Genre(8, "Приключения")))
+            .genres(List.of(new Genre(2, "Драма")))
             .rate(2)
             .build();
     final Film testFilm3 = Film.builder().id(3)
@@ -55,8 +48,7 @@ public class FilmServiceIntegrationTest {
             .releaseDate(LocalDate.parse("1988-07-12"))
             .duration(133)
             .mpa(new Mpa(4, "R"))
-            .genres(List.of(new Genre(4, "Триллер"), new Genre(6, "Боевик"),
-                    new Genre(9, "Криминал")))
+            .genres(List.of(new Genre(4, "Триллер"), new Genre(6, "Боевик")))
             .rate(0)
             .build();
     final Film testFilm4 = Film.builder().id(4)
@@ -117,8 +109,7 @@ public class FilmServiceIntegrationTest {
                 .releaseDate(LocalDate.parse("2021-05-18"))
                 .duration(134)
                 .mpa(new Mpa(3, "PG-13"))
-                .genres(List.of(new Genre(1, "Комедия"), new Genre(2, "Драма"),
-                        new Genre(9, "Криминал")))
+                .genres(List.of(new Genre(1, "Комедия"), new Genre(2, "Драма")))
                 .build();
         final Film expectedFilm = modifiedFilm;
 
@@ -261,10 +252,7 @@ public class FilmServiceIntegrationTest {
                 new Genre(3, "Мультфильм"),
                 new Genre(4, "Триллер"),
                 new Genre(5, "Документальный"),
-                new Genre(6, "Боевик"),
-                new Genre(7, "Фантастика"),
-                new Genre(8, "Приключения"),
-                new Genre(9, "Криминал"));
+                new Genre(6, "Боевик"));
 
 
         assertEquals(expectedGenres, filmService.getAllGenres(), "Список жанров не совпадает с ожидаемым");
@@ -295,7 +283,6 @@ public class FilmServiceIntegrationTest {
                 new Mpa(3, "PG-13"),
                 new Mpa(4, "R"),
                 new Mpa(5, "NC-17"));
-
 
         assertEquals(expectedMpa, filmService.getAllMpa(), "Список жанров не совпадает с ожидаемым");
     }

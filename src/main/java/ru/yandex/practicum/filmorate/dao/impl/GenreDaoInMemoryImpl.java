@@ -22,11 +22,6 @@ public class GenreDaoInMemoryImpl implements GenreDao {
             4, new Genre(4, "Триллер"),
             5, new Genre(5, "Документальный"),
             6, new Genre(6, "Боевик"));
-    private final GenresDaoInMemoryImpl genresDao;
-
-    public GenreDaoInMemoryImpl(@Qualifier("genresDaoInMemoryImpl") GenresDaoInMemoryImpl genresDao) {
-        this.genresDao = genresDao;
-    }
 
     @Override
     public List<Genre> findAll() {
@@ -38,13 +33,5 @@ public class GenreDaoInMemoryImpl implements GenreDao {
     @Override
     public Optional<Genre> findById(int id) {
         return Optional.ofNullable(genres.get(id));
-    }
-
-    @Override
-    public List<Genre> findByFilmId(int filmId) {
-        return genresDao.getFilmGenres().stream()
-                .filter(filmGenre -> filmGenre.getFilmId() == filmId)
-                .map(filmGenre -> genres.get(filmGenre.getGenreId()))
-                .collect(Collectors.toList());
     }
 }

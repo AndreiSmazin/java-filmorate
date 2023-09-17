@@ -22,14 +22,14 @@ public class FriendDaoDbImpl implements FriendDao {
     private static final String FIND_BY_ID_QUERY = "SELECT user_id, friend_id, is_approved FROM public.friend" +
             " WHERE user_id = :userId AND friend_id = :friendId";
     private static final String SAVE_QUERY = "INSERT INTO public.friend (user_id, friend_id, is_approved)" +
-            " VALUES (:userId, :friendId , false)";
+            " VALUES (:userId, :friendId , :isApproved)";
     private static final String UPDATE_QUERY = "UPDATE public.friend SET is_approved = :isApproved" +
             " WHERE user_id = :userId AND friend_id = :friendId";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM public.friend WHERE user_id = :userId" +
             " AND friend_id = :friendId";
     private static final String FIND_FRIENDS_BY_ID_QUERY = "SELECT id, email, login, user_name, birthday" +
             " FROM public.users WHERE id IN" +
-            " (SELECT friend_id FROM public.friend WHERE user_id = :id)";
+            " (SELECT friend_id FROM public.friend WHERE user_id = :id AND is_approved = true)";
     private static final String FIND_COMMON_FRIENDS_QUERY = "SELECT id, email, login, user_name, birthday" +
             " FROM public.users WHERE id IN" +
             " (SELECT friend_id FROM public.friend WHERE user_id = :id)" +
@@ -69,12 +69,13 @@ public class FriendDaoDbImpl implements FriendDao {
     }
 
     @Override
-    public void save(int userId, int friendId) {
-        log.debug("+ save Friend: {}, {}", userId, friendId);
+    public void save(int userId, int friendId, boolean isApproved) {
+        log.debug("+ save Friend: {}, {}, {}", userId, friendId, isApproved);
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("userId", userId);
         parameters.addValue("friendId", friendId);
+        parameters.addValue("isApproved", isApproved);
 
         jdbcTemplate.update(SAVE_QUERY, parameters);
     }

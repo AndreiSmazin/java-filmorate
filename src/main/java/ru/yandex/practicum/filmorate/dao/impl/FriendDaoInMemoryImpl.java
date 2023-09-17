@@ -39,17 +39,19 @@ public class FriendDaoInMemoryImpl implements FriendDao {
     }
 
     @Override
-    public void save(int userId, int friendId) {
-        log.debug("+ save Friend: {}, {}", userId, friendId);
+    public void save(int userId, int friendId, boolean isApproved) {
+        log.debug("+ save Friend: {}, {}, {}", userId, friendId, isApproved);
 
-        friends.add(new Friend(userId, friendId, false));
+        friends.add(new Friend(userId, friendId, isApproved));
     }
 
     @Override
     public void update(int userId, int friendId, boolean isApproved) {
-        log.debug("+ update Friend: {}, {}", userId, friendId);
+        log.debug("+ update Friend: {}, {}, {}", userId, friendId, isApproved);
 
-        friends.add(new Friend(userId, friendId, isApproved));
+        Friend updatedFriend = new Friend(userId, friendId, isApproved);
+        friends.remove(updatedFriend);
+        friends.add(updatedFriend);
     }
 
     @Override
@@ -65,6 +67,7 @@ public class FriendDaoInMemoryImpl implements FriendDao {
 
         return friends.stream()
                 .filter(friend -> friend.getUserId() == id)
+                .filter(Friend::isApproved)
                 .map(friend -> users.get(friend.getFriendId()))
                 .collect(Collectors.toList());
     }

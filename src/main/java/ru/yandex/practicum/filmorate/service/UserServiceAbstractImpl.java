@@ -60,6 +60,10 @@ public abstract class UserServiceAbstractImpl implements UserService {
 
         findUser(id);
 
+        for (User friend : friendDao.findFriendsById(id)) {
+            deleteFriend(id, friend.getId());
+        }
+
         userDao.deleteById(id);
     }
 
@@ -70,11 +74,11 @@ public abstract class UserServiceAbstractImpl implements UserService {
         findUser(friendId);
         validateFriendId(userId, friendId);
 
-        friendDao.save(userId, friendId);
-
-        if (friendDao.findById(friendId, userId).isPresent()) {
+        if (friendDao.findById(userId, friendId).isEmpty()) {
+            friendDao.save(userId, friendId, true);
+            friendDao.save(friendId, userId, false);
+        } else {
             friendDao.update(userId, friendId, true);
-            friendDao.update(friendId, userId, true);
         }
     }
 
@@ -86,10 +90,7 @@ public abstract class UserServiceAbstractImpl implements UserService {
         validateFriendId(userId, friendId);
 
         friendDao.deleteById(userId, friendId);
-
-        if (friendDao.findById(friendId, userId).isPresent()) {
-            friendDao.update(friendId, userId, false);
-        }
+        friendDao.deleteById(friendId, userId);
     }
 
     public List<User> findFriends(int userId) {
