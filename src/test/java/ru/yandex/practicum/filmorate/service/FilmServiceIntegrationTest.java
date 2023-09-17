@@ -64,7 +64,7 @@ public abstract class FilmServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает список всех фильмов")
-    public void ShouldReturnAllFilms() throws Exception {
+    public void shouldReturnAllFilms() throws Exception {
         final List<Film> expectedFilms = List.of(testFilm1, testFilm2, testFilm3);
 
         assertEquals(expectedFilms, filmService.findAllFilms(), "Список фильмов не совпадает с ожидаемым");
@@ -214,7 +214,7 @@ public abstract class FilmServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает список наиболее популярных фильмов")
-    public void ShouldReturnPopularFilms() throws Exception {
+    public void shouldReturnPopularFilms() throws Exception {
         final List<Film> expectedFilms = List.of(testFilm2, testFilm1, testFilm3);
         int limit = 10;
 
@@ -229,7 +229,7 @@ public abstract class FilmServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает жанр по заданному id, выбрасывает исключение если жанр с заданным id отсутствует")
-    public void ShouldReturnGenreById() throws Exception {
+    public void shouldReturnGenreById() throws Exception {
         final int id = 5;
         final Genre expectedGenre = new Genre(5, "Документальный");
 
@@ -246,7 +246,7 @@ public abstract class FilmServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает список всех жанров")
-    public void ShouldReturnAllGenres() throws Exception {
+    public void shouldReturnAllGenres() throws Exception {
         final List<Genre> expectedGenres = List.of(new Genre(1, "Комедия"),
                 new Genre(2, "Драма"),
                 new Genre(3, "Мультфильм"),
@@ -260,7 +260,7 @@ public abstract class FilmServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает MPA по заданному id, выбрасывает исключение если MPA с заданным id отсутствует")
-    public void ShouldReturnMpaById() throws Exception {
+    public void shouldReturnMpaById() throws Exception {
         final int id = 4;
         final Mpa expectedMpa = new Mpa(4, "R");
 
@@ -277,7 +277,7 @@ public abstract class FilmServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает список всех MPA")
-    public void ShouldReturnAllMpa() throws Exception {
+    public void shouldReturnAllMpa() throws Exception {
         final List<Mpa> expectedMpa = List.of(new Mpa(1, "G"),
                 new Mpa(2, "PG"),
                 new Mpa(3, "PG-13"),

@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @AllArgsConstructor
-public class UserServiceIntegrationTest {
+public abstract class UserServiceIntegrationTest {
     protected final UserService userService;
 
     final User testUser1 = User.builder().id(1)
@@ -48,7 +48,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает список всех пользователей")
-    public void ShouldReturnAllUsers() throws Exception {
+    public void shouldReturnAllUsers() throws Exception {
         final List<User> expectedUsers = List.of(testUser1, testUser2, testUser3);
 
         assertEquals(expectedUsers, userService.findAllUsers(), "Список пользователей не совпадает с" +
@@ -220,7 +220,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает список общих друзей двух пользователей")
-    public void ShouldReturnСщььщтFriendsOfUsers() throws Exception {
+    public void shouldReturnCommonFriendsOfUsers() throws Exception {
         final int userId = 1;
         final int otherUserId = 3;
         final List<User> expectedFriends = List.of(testUser2);
