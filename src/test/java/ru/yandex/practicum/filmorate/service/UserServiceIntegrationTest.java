@@ -208,7 +208,7 @@ public abstract class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("Возвращает список всех друзей пользователя")
-    public void ShouldReturnFriendsOfUser() throws Exception {
+    public void shouldReturnFriendsOfUser() throws Exception {
         final int userId = 2;
         final List<User> expectedFriends = List.of(testUser1, testUser3);
 
