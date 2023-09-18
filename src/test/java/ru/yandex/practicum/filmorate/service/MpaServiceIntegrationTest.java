@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @AllArgsConstructor
-public class MpaServiceIntegrationTest {
+public abstract class MpaServiceIntegrationTest {
     protected final MpaService mpaService;
 
     @Test

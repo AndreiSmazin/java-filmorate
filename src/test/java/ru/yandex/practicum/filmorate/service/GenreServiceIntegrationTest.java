@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @AllArgsConstructor
-public class GenreServiceIntegrationTest {
+public abstract class GenreServiceIntegrationTest {
     protected final GenreService genreService;
 
     @Test
