@@ -94,9 +94,7 @@ public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements 
 
     @Override
     public List<Film> getPopularFilms(int limit) {
-        return super.likeDao.findPopularFilms().stream()
-                .limit(limit)
-                .collect(Collectors.toList());
+        return super.likeDao.findPopularFilms(limit);
     }
 
     private List<Genre> checkGenres(Film film) {

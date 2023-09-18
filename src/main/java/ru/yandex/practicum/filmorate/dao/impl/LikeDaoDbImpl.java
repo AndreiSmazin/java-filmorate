@@ -23,7 +23,7 @@ public class LikeDaoDbImpl implements LikeDao {
             " (user_id = :userId)";
     private static final String FIND_POPULAR_FILMS_QUERY = "SELECT f.id, f.name film_name, f.description," +
             " f.release_date, f.duration, m.id mpa_id, m.name mpa_name, f.rate FROM public.films f" +
-            " JOIN public.mpa m ON f.mpa_id = m.id ORDER BY f.rate DESC";
+            " JOIN public.mpa m ON f.mpa_id = m.id ORDER BY f.rate DESC, f.id LIMIT :limit";
 
     private static final String UPDATE_RATE_QUERY = "UPDATE public.films SET rate = :rate WHERE id = :id";
 
@@ -68,8 +68,11 @@ public class LikeDaoDbImpl implements LikeDao {
     }
 
     @Override
-    public List<Film> findPopularFilms() {
-        return jdbcTemplate.query(FIND_POPULAR_FILMS_QUERY, ROW_MAPPER);
+    public List<Film> findPopularFilms(int limit) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("limit", limit);
+
+        return jdbcTemplate.query(FIND_POPULAR_FILMS_QUERY, parameters, ROW_MAPPER);
     }
 
     @Override

@@ -109,9 +109,7 @@ public class FilmServiceDbImpl extends FilmServiceAbstractImpl implements FilmSe
 
     @Override
     public List<Film> getPopularFilms(int limit) {
-        List<Film> films = super.likeDao.findPopularFilms().stream()
-                .limit(limit)
-                .collect(Collectors.toList());
+        List<Film> films = super.likeDao.findPopularFilms(limit);
 
         for (Film film : films) {
             film.setGenres(genresDao.findByFilmId(film.getId()));

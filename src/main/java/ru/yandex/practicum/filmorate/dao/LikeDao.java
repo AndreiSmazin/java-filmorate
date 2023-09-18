@@ -10,7 +10,7 @@ public interface LikeDao {
 
     void deleteById(int filmId, int likeId);
 
-    List<Film> findPopularFilms();
+    List<Film> findPopularFilms(int limit);
 
     void updateFilmRate(int filmId, int rate);
 }
