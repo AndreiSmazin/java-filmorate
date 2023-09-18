@@ -6,6 +6,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.service.impl.FilmServiceInMemoryImpl;
+import ru.yandex.practicum.filmorate.service.impl.UserServiceInMemoryImpl;
 
 import java.time.LocalDate;
 

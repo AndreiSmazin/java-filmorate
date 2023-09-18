@@ -1,16 +1,18 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
-import ru.yandex.practicum.filmorate.dao.GenreDao;
 import ru.yandex.practicum.filmorate.dao.LikeDao;
-import ru.yandex.practicum.filmorate.dao.MpaDao;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.Genre;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.GenreService;
+import ru.yandex.practicum.filmorate.service.MpaService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +24,11 @@ import java.util.stream.Collectors;
 public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements FilmService {
     @Autowired
     public FilmServiceInMemoryImpl(@Qualifier("filmDaoInMemoryImpl") FilmDao filmDao,
-                                   @Qualifier("mpaDaoInMemoryImpl") MpaDao mpaDao,
-                                   @Qualifier("genreDaoInMemoryImpl") GenreDao genreDao,
                                    @Qualifier("likeDaoInMemoryImpl") LikeDao likeDao,
-                                   @Qualifier("userServiceInMemoryImpl") UserService userService) {
-        super(filmDao, mpaDao, genreDao, likeDao, userService);
+                                   @Qualifier("userServiceInMemoryImpl") UserService userService,
+                                   @Qualifier("genreServiceInMemoryImpl") GenreService genreService,
+                                   @Qualifier("mpaServiceInMemoryImpl") MpaService mpaService) {
+        super(filmDao, likeDao, userService, genreService, mpaService);
     }
 
     @Override
@@ -45,14 +47,10 @@ public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements 
         log.debug("+ createFilm: {}", film);
 
         film.setRate(0);
-        film.setMpa(getMpaById(film.getMpa().getId()));
+        film.setMpa(super.mpaService.getMpaById(film.getMpa().getId()));
 
         if (film.getGenres() != null) {
-            List<Genre> genres = film.getGenres().stream()
-                    .map(genre -> getGenreById(genre.getId()))
-                    .distinct()
-                    .collect(Collectors.toList());
-            film.setGenres(genres);
+            film.setGenres(checkGenres(film));
         } else {
             film.setGenres(new ArrayList<>());
         }
@@ -73,14 +71,10 @@ public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements 
         targetFilm.setDescription(film.getDescription());
         targetFilm.setReleaseDate(film.getReleaseDate());
         targetFilm.setDuration(film.getDuration());
-        targetFilm.setMpa(getMpaById(film.getMpa().getId()));
+        targetFilm.setMpa(super.mpaService.getMpaById(film.getMpa().getId()));
 
         if (film.getGenres() != null) {
-            List<Genre> genres = film.getGenres().stream()
-                    .map(genre -> getGenreById(genre.getId()))
-                    .distinct()
-                    .collect(Collectors.toList());
-            targetFilm.setGenres(genres);
+            targetFilm.setGenres(checkGenres(film));
         } else {
             targetFilm.setGenres(new ArrayList<>());
         }
@@ -102,6 +96,13 @@ public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements 
     public List<Film> getPopularFilms(int limit) {
         return super.likeDao.findPopularFilms().stream()
                 .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    private List<Genre> checkGenres(Film film) {
+        return film.getGenres().stream()
+                .map(genre -> super.genreService.getGenreById(genre.getId()))
+                .distinct()
                 .collect(Collectors.toList());
     }
 }

@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.entity.Film;
-import ru.yandex.practicum.filmorate.entity.Genre;
-import ru.yandex.practicum.filmorate.entity.Mpa;
 
 import java.util.List;
 
@@ -22,12 +20,4 @@ public interface FilmService {
     void deleteLike(int filmId, int userId);
 
     List<Film> getPopularFilms(int limit);
-
-    List<Genre> getAllGenres();
-
-    Genre getGenreById(int id);
-
-    List<Mpa> getAllMpa();
-
-    Mpa getMpaById(int id);
 }

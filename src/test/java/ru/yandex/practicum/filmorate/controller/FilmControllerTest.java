@@ -15,9 +15,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.entity.Film;
-import ru.yandex.practicum.filmorate.entity.Genre;
 import ru.yandex.practicum.filmorate.entity.Mpa;
-import ru.yandex.practicum.filmorate.service.FilmServiceDbImpl;
+import ru.yandex.practicum.filmorate.service.impl.FilmServiceDbImpl;
 import ru.yandex.practicum.filmorate.valid.ValidationErrorResponse;
 import ru.yandex.practicum.filmorate.valid.Violation;
 
@@ -220,72 +219,6 @@ public class FilmControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(films)));
-    }
-
-    @Test
-    @DisplayName("GET /genres возвращает HTTP-ответ со статусом 200, типом данных application/json и списком жанров " +
-            "в теле")
-    void shouldReturnAllGenres() throws Exception {
-        final Genre firstGenre = new Genre(1, "Комедия");
-        final Genre secondGenre = new Genre(2, "Боевик");
-
-        final List<Genre> genres = List.of(firstGenre, secondGenre);
-
-        when(filmService.getAllGenres()).thenReturn(genres);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/genres"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(genres)));
-    }
-
-    @Test
-    @DisplayName("GET /genres/{id} возвращает HTTP-ответ со статусом 200, типом данных application/json и жанром " +
-            "в теле")
-    void shouldReturnGenre() throws Exception {
-        final Genre testGenre = new Genre(1, "Комедия");
-
-        when(filmService.getGenreById(testGenre.getId())).thenReturn(testGenre);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/genres/" + testGenre.getId()))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testGenre)));
-    }
-
-    @Test
-    @DisplayName("GET /mpa возвращает HTTP-ответ со статусом 200, типом данных application/json и списком MPA " +
-            "в теле")
-    void shouldReturnAllMpa() throws Exception {
-        final Mpa firstMpa = new Mpa(1, "R");
-        final Mpa secondMpa = new Mpa(2, "PG-13");
-
-        final List<Mpa> mpa = List.of(firstMpa, secondMpa);
-
-        when(filmService.getAllMpa()).thenReturn(mpa);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/mpa"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(mpa)));
-    }
-
-    @Test
-    @DisplayName("GET /mpa/{id} возвращает HTTP-ответ со статусом 200, типом данных application/json и MPA " +
-            "в теле")
-    void shouldReturnMpa() throws Exception {
-        final Mpa testMpa = new Mpa(1, "R");
-
-        when(filmService.getMpaById(testMpa.getId())).thenReturn(testMpa);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/mpa/" + testMpa.getId()))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(testMpa)));
     }
 }
 

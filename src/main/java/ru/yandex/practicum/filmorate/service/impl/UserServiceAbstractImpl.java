@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.dao.FriendDao;
@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectFriendIdException;
 import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
 
