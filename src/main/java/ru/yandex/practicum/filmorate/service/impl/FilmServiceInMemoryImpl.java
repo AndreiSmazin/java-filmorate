@@ -64,14 +64,14 @@ public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements 
     public Film updateFilm(Film film) {
         log.debug("+ updateFilm: {}", film);
 
-        int id = film.getId();
-        Film targetFilm = findFilm(id);
-
-        targetFilm.setName(film.getName());
-        targetFilm.setDescription(film.getDescription());
-        targetFilm.setReleaseDate(film.getReleaseDate());
-        targetFilm.setDuration(film.getDuration());
-        targetFilm.setMpa(super.mpaService.getMpaById(film.getMpa().getId()));
+        Film targetFilm = Film.builder().id(film.getId())
+                .name(film.getName())
+                .description(film.getDescription())
+                .releaseDate(film.getReleaseDate())
+                .duration(film.getDuration())
+                .mpa(super.mpaService.getMpaById(film.getMpa().getId()))
+                .build();
+        super.filmDao.update(targetFilm);
 
         if (film.getGenres() != null) {
             targetFilm.setGenres(checkGenres(film));
@@ -79,7 +79,6 @@ public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements 
             targetFilm.setGenres(new ArrayList<>());
         }
 
-        super.filmDao.update(targetFilm);
         return targetFilm;
     }
 

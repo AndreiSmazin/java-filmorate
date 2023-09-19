@@ -45,14 +45,14 @@ public abstract class UserServiceAbstractImpl implements UserService {
     public User updateUser(User user) {
         log.debug("+ updateUser: {}", user);
 
-        User targetUser = findUser(user.getId());
-
-        targetUser.setEmail(user.getEmail());
-        targetUser.setLogin(user.getLogin());
-        targetUser.setName(user.getName());
-        targetUser.setBirthday(user.getBirthday());
-
+        User targetUser = User.builder().id(user.getId())
+                .email(user.getEmail())
+                .login(user.getLogin())
+                .name(user.getName())
+                .birthday(user.getBirthday())
+                .build();
         userDao.update(user);
+
         return targetUser;
     }
 
@@ -71,8 +71,6 @@ public abstract class UserServiceAbstractImpl implements UserService {
     public void addFriend(int userId, int friendId) {
         log.debug("+ addFriend: {}, {}", userId, friendId);
 
-        findUser(userId);
-        findUser(friendId);
         validateFriendId(userId, friendId);
 
         if (friendDao.findById(userId, friendId).isEmpty()) {

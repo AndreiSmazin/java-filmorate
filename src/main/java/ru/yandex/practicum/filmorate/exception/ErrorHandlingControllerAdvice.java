@@ -60,27 +60,11 @@ public class ErrorHandlingControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("id", e.getMessage()));
     }
 
-    @ExceptionHandler(FriendNotFoundException.class)
-    public ResponseEntity<Violation> onFriendNotFoundException(FriendNotFoundException e) {
-        log.error("Некорректный запрос: пользователь с id={} не найден в списке друзей пользователя с id={}",
-                e.getFriendId(), e.getUserId());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("friendId", e.getMessage()));
-    }
-
     @ExceptionHandler(IncorrectFriendIdException.class)
     public ResponseEntity<Violation> onIncorrectFriendIdException(IncorrectFriendIdException e) {
         log.error("Некорректный запрос: id пользователя и id друга совпадают");
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("friendId", e.getMessage()));
-    }
-
-    @ExceptionHandler(LikeNotFoundException.class)
-    public ResponseEntity<Violation> onLikeNotFoundException(LikeNotFoundException e) {
-        log.error("Некорректный запрос: лайк пользователя с id={} не найден в списке лайков фильма с id={}",
-                e.getFilmId(), e.getUserID());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Violation("userId", e.getMessage()));
     }
 
     private String getFieldName(ConstraintViolation constraintViolation) {

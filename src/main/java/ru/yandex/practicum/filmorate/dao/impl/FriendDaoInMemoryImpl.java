@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.FriendDao;
 import ru.yandex.practicum.filmorate.entity.Friend;
 import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +23,8 @@ public class FriendDaoInMemoryImpl implements FriendDao {
     private final Set<Friend> friends = new HashSet<>();
     private final UserDaoInMemoryImpl userDao;
 
-    public FriendDaoInMemoryImpl(@Qualifier("userDaoInMemoryImpl") UserDaoInMemoryImpl userDao) {
+    @Autowired
+    public FriendDaoInMemoryImpl(UserDaoInMemoryImpl userDao) {
         this.userDao = userDao;
     }
 
@@ -42,7 +45,11 @@ public class FriendDaoInMemoryImpl implements FriendDao {
     public void save(int userId, int friendId, boolean isApproved) {
         log.debug("+ save Friend: {}, {}, {}", userId, friendId, isApproved);
 
-        friends.add(new Friend(userId, friendId, isApproved));
+        if (userDao.getUsers().containsKey(userId) && userDao.getUsers().containsKey(friendId)) {
+            friends.add(new Friend(userId, friendId, isApproved));
+        } else {
+            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
+        }
     }
 
     @Override

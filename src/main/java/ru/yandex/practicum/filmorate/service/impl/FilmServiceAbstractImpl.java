@@ -38,7 +38,6 @@ public abstract class FilmServiceAbstractImpl {
         log.debug("+ addLike: {}, {}", filmId, userId);
 
         int filmRate = findFilm(filmId).getRate();
-        userService.findUser(userId);
 
         likeDao.save(new Like(filmId, userId));
         likeDao.updateFilmRate(filmId, filmRate + 1);

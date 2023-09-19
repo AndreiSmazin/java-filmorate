@@ -77,23 +77,22 @@ public class FilmServiceDbImpl extends FilmServiceAbstractImpl implements FilmSe
     public Film updateFilm(Film film) {
         log.debug("+ updateFilm: {}", film);
 
-        int id = film.getId();
-        Film targetFilm = findFilm(id);
-
-        targetFilm.setName(film.getName());
-        targetFilm.setDescription(film.getDescription());
-        targetFilm.setReleaseDate(film.getReleaseDate());
-        targetFilm.setDuration(film.getDuration());
-        targetFilm.setMpa(super.mpaService.getMpaById(film.getMpa().getId()));
+        Film targetFilm = Film.builder().id(film.getId())
+                .name(film.getName())
+                .description(film.getDescription())
+                .releaseDate(film.getReleaseDate())
+                .duration(film.getDuration())
+                .mpa(super.mpaService.getMpaById(film.getMpa().getId()))
+                .build();
+        super.filmDao.update(targetFilm);
 
         if (film.getGenres() != null) {
-            genresDao.deleteByFilmId(id);
+            genresDao.deleteByFilmId(targetFilm.getId());
             targetFilm.setGenres(checkAndSaveGenres(film));
         } else {
             targetFilm.setGenres(new ArrayList<>());
         }
 
-        super.filmDao.update(targetFilm);
         return targetFilm;
     }
 
@@ -103,8 +102,8 @@ public class FilmServiceDbImpl extends FilmServiceAbstractImpl implements FilmSe
 
         findFilm(id);
 
-        genresDao.deleteByFilmId(id);
         super.filmDao.deleteById(id);
+        genresDao.deleteByFilmId(id);
     }
 
     @Override

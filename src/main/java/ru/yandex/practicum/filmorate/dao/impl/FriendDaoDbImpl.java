@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.FriendDao;
 import ru.yandex.practicum.filmorate.entity.Friend;
 import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +79,11 @@ public class FriendDaoDbImpl implements FriendDao {
         parameters.addValue("friendId", friendId);
         parameters.addValue("isApproved", isApproved);
 
-        jdbcTemplate.update(SAVE_QUERY, parameters);
+        try {
+            jdbcTemplate.update(SAVE_QUERY, parameters);
+        } catch (DataIntegrityViolationException e) {
+            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
+        }
     }
 
     @Override

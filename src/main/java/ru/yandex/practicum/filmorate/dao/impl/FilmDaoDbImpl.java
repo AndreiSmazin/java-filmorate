@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.Mpa;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,7 @@ public class FilmDaoDbImpl implements FilmDao {
             .build();
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    private KeyHolder keyHolder = new GeneratedKeyHolder();
 
     @Autowired
     public FilmDaoDbImpl(NamedParameterJdbcTemplate jdbcTemplate) {
@@ -81,8 +83,6 @@ public class FilmDaoDbImpl implements FilmDao {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         insertParameters(parameters, film);
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
         jdbcTemplate.update(SAVE_QUERY, parameters, keyHolder, new String[]{"id"});
 
         return keyHolder.getKey().intValue();
@@ -95,7 +95,11 @@ public class FilmDaoDbImpl implements FilmDao {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         insertParameters(parameters, film);
 
-        jdbcTemplate.update(UPDATE_QUERY, parameters);
+        jdbcTemplate.update(UPDATE_QUERY, parameters, keyHolder, new String[]{"id"});
+
+        if (keyHolder.getKey() == null) {
+            throw new IdNotFoundException("фильм с заданным id не найден", "фильм");
+        }
     }
 
     @Override

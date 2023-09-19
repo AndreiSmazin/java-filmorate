@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -11,6 +12,7 @@ import ru.yandex.practicum.filmorate.dao.LikeDao;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.Like;
 import ru.yandex.practicum.filmorate.entity.Mpa;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 
 import java.util.List;
 
@@ -53,7 +55,11 @@ public class LikeDaoDbImpl implements LikeDao {
         parameters.addValue("filmId", like.getFilmId());
         parameters.addValue("userId", like.getUserId());
 
-        jdbcTemplate.update(SAVE_QUERY, parameters);
+        try {
+            jdbcTemplate.update(SAVE_QUERY, parameters);
+        } catch (DataIntegrityViolationException e) {
+            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
+        }
     }
 
     @Override

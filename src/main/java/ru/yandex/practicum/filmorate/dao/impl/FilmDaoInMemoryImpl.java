@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.entity.Film;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +46,11 @@ public class FilmDaoInMemoryImpl implements FilmDao {
     public void update(Film film) {
         log.debug("+ update Film: {}", film);
 
-        films.put(film.getId(), film);
+        if (films.containsKey(film.getId())) {
+            films.put(film.getId(), film);
+        } else {
+            throw new IdNotFoundException("фильм с заданным id не найден", "фильм");
+        }
     }
 
     @Override

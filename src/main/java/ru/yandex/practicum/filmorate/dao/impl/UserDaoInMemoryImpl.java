@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +46,11 @@ public class UserDaoInMemoryImpl implements UserDao {
     public void update(User user) {
         log.debug("+ update User: {}", user);
 
-        users.put(user.getId(), user);
+        if (users.containsKey(user.getId())) {
+            users.put(user.getId(), user);
+        } else {
+            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
+        }
     }
 
     @Override

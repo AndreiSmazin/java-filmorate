@@ -12,6 +12,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.exception.IdNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ public class UserDaoDbImpl implements UserDao {
             .build();
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    private KeyHolder keyHolder = new GeneratedKeyHolder();
 
     @Autowired
     public UserDaoDbImpl(NamedParameterJdbcTemplate jdbcTemplate) {
@@ -68,8 +70,6 @@ public class UserDaoDbImpl implements UserDao {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         insertParameters(parameters, user);
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
         jdbcTemplate.update(SAVE_QUERY, parameters, keyHolder, new String[]{"id"});
 
         return keyHolder.getKey().intValue();
@@ -82,7 +82,11 @@ public class UserDaoDbImpl implements UserDao {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         insertParameters(parameters, user);
 
-        jdbcTemplate.update(UPDATE_QUERY, parameters);
+        jdbcTemplate.update(UPDATE_QUERY, parameters, keyHolder, new String[]{"id"});
+
+        if (keyHolder.getKey() == null) {
+            throw new IdNotFoundException("пользователь с заданным id не найден", "пользователь");
+        }
     }
 
     @Override

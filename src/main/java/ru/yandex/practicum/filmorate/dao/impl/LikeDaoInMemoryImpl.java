@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.LikeDao;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.Like;
+import ru.yandex.practicum.filmorate.service.impl.UserServiceInMemoryImpl;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -19,14 +21,19 @@ import java.util.stream.Collectors;
 public class LikeDaoInMemoryImpl implements LikeDao {
     private final Set<Like> likes = new HashSet<>();
     private final FilmDaoInMemoryImpl filmDao;
+    private final UserServiceInMemoryImpl userService;
 
-    public LikeDaoInMemoryImpl(@Qualifier("filmDaoInMemoryImpl") FilmDaoInMemoryImpl filmDao) {
+    @Autowired
+    public LikeDaoInMemoryImpl(FilmDaoInMemoryImpl filmDao, UserServiceInMemoryImpl userService) {
         this.filmDao = filmDao;
+        this.userService = userService;
     }
 
     @Override
     public void save(Like like) {
         log.debug("+ save: {}", like);
+
+        userService.findUser(like.getUserId());
 
         likes.add(like);
     }
