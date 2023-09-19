@@ -59,6 +59,8 @@ public class FriendDaoDbImpl implements FriendDao {
 
     @Override
     public Optional<Friend> findById(int userId, int friendId) {
+        log.debug("+ findById Friend: {}, {}", userId, friendId);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("userId", userId);
         parameters.addValue("friendId", friendId);
@@ -100,7 +102,7 @@ public class FriendDaoDbImpl implements FriendDao {
 
     @Override
     public void deleteById(int userId, int friendId) {
-        log.debug("+ delete Friend: {}, {}", userId, friendId);
+        log.debug("+ deleteById Friend: {}, {}", userId, friendId);
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("userId", userId);
@@ -111,6 +113,8 @@ public class FriendDaoDbImpl implements FriendDao {
 
     @Override
     public List<User> findFriendsById(int id) {
+        log.debug("+ findFriendsById: {}", id);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("id", id);
 
@@ -119,6 +123,8 @@ public class FriendDaoDbImpl implements FriendDao {
 
     @Override
     public List<User> findCommonFriends(int id, int otherId) {
+        log.debug("+ findCommonFriends: {}, {}", id, otherId);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("id", id);
         parameters.addValue("otherId", otherId);

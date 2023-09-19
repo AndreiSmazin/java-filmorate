@@ -47,6 +47,8 @@ public class LikeDaoInMemoryImpl implements LikeDao {
 
     @Override
     public List<Film> findPopularFilms(int limit) {
+        log.debug("+ findPopularFilms: {}", limit);
+
         return filmDao.getFilms().values().stream()
                 .sorted(Comparator.comparing(Film::getRate).reversed())
                 .limit(limit)
@@ -55,6 +57,8 @@ public class LikeDaoInMemoryImpl implements LikeDao {
 
     @Override
     public void updateFilmRate(int filmId, int rate) {
+        log.debug("+ updateFilmRate: {}, {}", filmId, rate);
+
         filmDao.getFilms().get(filmId).setRate(rate);
     }
 }

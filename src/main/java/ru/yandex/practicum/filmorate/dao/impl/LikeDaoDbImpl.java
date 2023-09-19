@@ -75,6 +75,8 @@ public class LikeDaoDbImpl implements LikeDao {
 
     @Override
     public List<Film> findPopularFilms(int limit) {
+        log.debug("+ findPopularFilms: {}", limit);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("limit", limit);
 
@@ -83,7 +85,7 @@ public class LikeDaoDbImpl implements LikeDao {
 
     @Override
     public void updateFilmRate(int filmId, int rate) {
-        log.debug("+ update FilRate: {}, {}", filmId, rate);
+        log.debug("+ updateFilmRate: {}, {}", filmId, rate);
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("id", filmId);

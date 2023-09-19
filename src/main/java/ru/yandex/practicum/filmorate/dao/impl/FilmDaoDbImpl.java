@@ -57,6 +57,8 @@ public class FilmDaoDbImpl implements FilmDao {
 
     @Override
     public List<Film> findAll() {
+        log.debug("+ findAll Film");
+
         try {
             return jdbcTemplate.query(FIND_ALL_QUERY, ROW_MAPPER);
         } catch (DataIntegrityViolationException e) {
@@ -66,6 +68,8 @@ public class FilmDaoDbImpl implements FilmDao {
 
     @Override
     public Optional<Film> findById(int id) {
+        log.debug("+ findById Film: {}", id);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("id", id);
 

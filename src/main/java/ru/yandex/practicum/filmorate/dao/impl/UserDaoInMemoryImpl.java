@@ -24,11 +24,15 @@ public class UserDaoInMemoryImpl implements UserDao {
 
     @Override
     public List<User> findAll() {
+        log.debug("+ findAll User");
+
         return new ArrayList<>(users.values());
     }
 
     @Override
     public Optional<User> findById(int id) {
+        log.debug("+ findById User: {}", id);
+
         return Optional.ofNullable(users.get(id));
     }
 

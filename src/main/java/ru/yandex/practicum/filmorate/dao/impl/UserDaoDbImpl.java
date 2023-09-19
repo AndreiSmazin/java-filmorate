@@ -48,11 +48,15 @@ public class UserDaoDbImpl implements UserDao {
 
     @Override
     public List<User> findAll() {
+        log.debug("+ findAll User");
+
         return jdbcTemplate.query(FIND_ALL_QUERY, ROW_MAPPER);
     }
 
     @Override
     public Optional<User> findById(int id) {
+        log.debug("+ findById User: {}", id);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("id", id);
 

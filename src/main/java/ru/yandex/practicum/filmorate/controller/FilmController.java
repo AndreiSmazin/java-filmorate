@@ -34,11 +34,13 @@ public class FilmController {
 
     @GetMapping
     public List<Film> findAll() {
+        log.info("Received GET-request /films");
         return filmService.findAllFilms();
     }
 
     @GetMapping("{id}")
     public Film find(@PathVariable int id) {
+        log.info("Received GET-request /films/{}", id);
         return filmService.findFilm(id);
     }
 
@@ -74,6 +76,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") @Min(1) int count) {
+        log.info("Received GET-request /films/popular?count={}", count);
         return filmService.getPopularFilms(count);
     }
 }

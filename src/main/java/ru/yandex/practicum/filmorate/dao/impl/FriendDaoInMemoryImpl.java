@@ -30,6 +30,8 @@ public class FriendDaoInMemoryImpl implements FriendDao {
 
     @Override
     public Optional<Friend> findById(int userId, int friendId) {
+        log.debug("+ findById Friend: {}, {}", userId, friendId);
+
         Friend friend = new Friend(userId, friendId, false);
 
         for (Friend currentFriend : friends) {
@@ -63,13 +65,15 @@ public class FriendDaoInMemoryImpl implements FriendDao {
 
     @Override
     public void deleteById(int userId, int friendId) {
-        log.debug("+ delete Friend: {}, {}", userId, friendId);
+        log.debug("+ deleteById Friend: {}, {}", userId, friendId);
 
         friends.remove(new Friend(userId, friendId, false));
     }
 
     @Override
     public List<User> findFriendsById(int id) {
+        log.debug("+ findFriendsById: {}", id);
+
         Map<Integer, User> users = userDao.getUsers();
 
         return friends.stream()
@@ -81,6 +85,8 @@ public class FriendDaoInMemoryImpl implements FriendDao {
 
     @Override
     public List<User> findCommonFriends(int id, int otherId) {
+        log.debug("+ findCommonFriends: {}, {}", id, otherId);
+
         return findFriendsById(id).stream()
                 .filter(findFriendsById(otherId)::contains)
                 .collect(Collectors.toList());

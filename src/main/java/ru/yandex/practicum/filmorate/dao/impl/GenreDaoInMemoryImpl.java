@@ -25,6 +25,8 @@ public class GenreDaoInMemoryImpl implements GenreDao {
 
     @Override
     public List<Genre> findAll() {
+        log.debug("+ findAll Genre");
+
         return genres.values().stream()
                 .sorted(Comparator.comparing(Genre::getId))
                 .collect(Collectors.toList());
@@ -32,6 +34,8 @@ public class GenreDaoInMemoryImpl implements GenreDao {
 
     @Override
     public Optional<Genre> findById(int id) {
+        log.debug("+ findById Genre: {}", id);
+
         return Optional.ofNullable(genres.get(id));
     }
 }

@@ -36,11 +36,15 @@ public class GenreDaoDbImpl implements GenreDao {
 
     @Override
     public List<Genre> findAll() {
+        log.debug("+ findAll Genre");
+
         return jdbcTemplate.query(FIND_ALL_QUERY, ROW_MAPPER);
     }
 
     @Override
     public Optional<Genre> findById(int id) {
+        log.debug("+ findById Genre: {}", id);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("id", id);
 

@@ -38,6 +38,8 @@ public class FilmServiceDbImpl extends FilmServiceAbstractImpl implements FilmSe
 
     @Override
     public List<Film> findAllFilms() {
+        log.debug("+ findAllFilm");
+
         List<Film> films = super.filmDao.findAll();
 
         for (Film film : films) {
@@ -49,6 +51,8 @@ public class FilmServiceDbImpl extends FilmServiceAbstractImpl implements FilmSe
 
     @Override
     public Film findFilm(int id) {
+        log.debug("+ findFilm: {}", id);
+
         Film film = super.filmDao.findById(id).orElseThrow(() -> new IdNotFoundException("фильм с заданным id не найден",
                 "фильм"));
 
@@ -108,6 +112,8 @@ public class FilmServiceDbImpl extends FilmServiceAbstractImpl implements FilmSe
 
     @Override
     public List<Film> getPopularFilms(int limit) {
+        log.debug("+ getPopularFilms: {}", limit);
+
         List<Film> films = super.likeDao.findPopularFilms(limit);
 
         for (Film film : films) {

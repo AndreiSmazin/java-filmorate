@@ -56,6 +56,8 @@ public class GenresDaoDbImpl implements GenresDao {
 
     @Override
     public List<Genre> findByFilmId(int filmId) {
+        log.debug("+ findByFilmId Genres: {}", filmId);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("filmId", filmId);
 

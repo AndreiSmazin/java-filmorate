@@ -34,11 +34,15 @@ public class MpaDaoDbImpl implements MpaDao {
 
     @Override
     public List<Mpa> findAll() {
+        log.debug("+ findAll Mpa");
+
         return jdbcTemplate.query(FIND_ALL_QUERY, ROW_MAPPER);
     }
 
     @Override
     public Optional<Mpa> findById(int id) {
+        log.debug("+ findById Mpa: {}", id);
+
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("id", id);
 

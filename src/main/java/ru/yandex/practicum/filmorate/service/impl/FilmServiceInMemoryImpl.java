@@ -33,11 +33,15 @@ public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements 
 
     @Override
     public List<Film> findAllFilms() {
+        log.debug("+ findAllFilm");
+
         return super.filmDao.findAll();
     }
 
     @Override
     public Film findFilm(int id) {
+        log.debug("+ findFilm: {}", id);
+
         return super.filmDao.findById(id).orElseThrow(() -> new IdNotFoundException("фильм с заданным id не найден",
                 "фильм"));
     }
@@ -93,6 +97,8 @@ public class FilmServiceInMemoryImpl extends FilmServiceAbstractImpl implements 
 
     @Override
     public List<Film> getPopularFilms(int limit) {
+        log.debug("+ getPopularFilms: {}", limit);
+
         return super.likeDao.findPopularFilms(limit);
     }
 

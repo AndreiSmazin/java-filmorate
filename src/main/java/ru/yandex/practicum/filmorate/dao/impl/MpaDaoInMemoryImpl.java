@@ -24,6 +24,8 @@ public class MpaDaoInMemoryImpl implements MpaDao {
 
     @Override
     public List<Mpa> findAll() {
+        log.debug("+ findAll Mpa");
+
         return mpa.values().stream()
                 .sorted(Comparator.comparingInt(Mpa::getId))
                 .collect(Collectors.toList());
@@ -31,6 +33,8 @@ public class MpaDaoInMemoryImpl implements MpaDao {
 
     @Override
     public Optional<Mpa> findById(int id) {
+        log.debug("+ findById Mpa: {}", id);
+
         return Optional.ofNullable(mpa.get(id));
     }
 }

@@ -24,11 +24,15 @@ public class FilmDaoInMemoryImpl implements FilmDao {
 
     @Override
     public List<Film> findAll() {
+        log.debug("+ findAll Film");
+
         return new ArrayList<>(films.values());
     }
 
     @Override
     public Optional<Film> findById(int id) {
+        log.debug("+ findById Film: {}", id);
+
         return Optional.ofNullable(films.get(id));
     }
 

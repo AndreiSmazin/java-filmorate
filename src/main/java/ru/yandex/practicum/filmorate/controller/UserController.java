@@ -30,11 +30,13 @@ public class UserController {
 
     @GetMapping
     public List<User> findAll() {
+        log.info("Received GET-request /users");
         return userService.findAllUsers();
     }
 
     @GetMapping("/{id}")
     public User find(@PathVariable int id) {
+        log.info("Received GET-request /users/{}", id);
         return userService.findUser(id);
     }
 
@@ -70,11 +72,13 @@ public class UserController {
 
     @GetMapping("/{userId}/friends")
     public List<User> findFriendsById(@PathVariable int userId) {
+        log.info("Received GET-request /users/{}/friends", userId);
         return userService.findFriends(userId);
     }
 
     @GetMapping("/{userId}/friends/common/{otherUserId}")
     public List<User> findCommonFriendsById(@PathVariable int userId, @PathVariable int otherUserId) {
+        log.info("Received GET-request /users/{}/friends/common/{}", userId, otherUserId);
         return userService.findCommonFriends(userId, otherUserId);
     }
 }
